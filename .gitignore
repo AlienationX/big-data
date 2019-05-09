@@ -1,0 +1,15 @@
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+target
+
+
+# log
+*.log*
+
+# resources
+*resources/*.xml
+logs/
