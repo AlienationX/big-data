@@ -1,4 +1,4 @@
-package com.ego.mr.mapper;
+package com.ego.mapreduce.mapper;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;

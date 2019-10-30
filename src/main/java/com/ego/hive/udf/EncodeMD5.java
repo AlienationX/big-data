@@ -2,6 +2,7 @@ package com.ego.hive.udf;
 
 import com.google.common.hash.Hashing;
 import org.apache.hadoop.hive.ql.exec.UDF;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 
 
 public class EncodeMD5 extends UDF {

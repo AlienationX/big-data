@@ -3,6 +3,7 @@ package com.ego.hive.udf;
 import java.util.Base64;
 
 import org.apache.hadoop.hive.ql.exec.UDF;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 
 /**
  * Hello world!

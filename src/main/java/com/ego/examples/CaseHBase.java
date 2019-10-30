@@ -1,4 +1,4 @@
-package com.ego.hbase;
+package com.ego.examples;
 
 import org.apache.hadoop.conf.Configuration;
 // import org.apache.hadoop.hbase.*;
@@ -27,10 +27,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class HelloWorld {
+public class CaseHBase {
     public static void main(String[] args) {
+        System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-common-2.6.0-bin");
+
         Configuration conf = HBaseConfiguration.create();
-        conf.set("hbase.zookeeper.quorum", "hi-prod-11.hillinsight.com:2181,hi-prod-12.hillinsight.com:2181,hi-prod-16.hillinsight.com:2181");
+        conf.set("hbase.zookeeper.quorum", "hadoop-dev01:2181,hadoop-dev02:2181,hadoop-dev03:2181");
         Connection conn;
         try {
             conn = ConnectionFactory.createConnection(conf);
@@ -75,6 +77,7 @@ public class HelloWorld {
             // 插入数据
             Put putOne = new Put(Bytes.toBytes("001"));  // 设置rowkey
             putOne.addColumn(Bytes.toBytes("f1"), Bytes.toBytes("name"), Bytes.toBytes("小明"));
+            putOne.addColumn(Bytes.toBytes("f1"), Bytes.toBytes("name_en"), Bytes.toBytes("xiaoming"));
             putOne.addColumn(Bytes.toBytes("f1"), Bytes.toBytes("sex"), Bytes.toBytes("男"));
             putOne.addColumn(Bytes.toBytes("f2"), Bytes.toBytes("english"), Bytes.toBytes("88"));
             putOne.addColumn(Bytes.toBytes("f2"), Bytes.toBytes("math"), Bytes.toBytes(String.valueOf(76)));  // 不能传入数字，否则会乱码，尽量将数字都转化成字符串，包括rowkey
@@ -82,9 +85,9 @@ public class HelloWorld {
 
             // 循环插入数据
             ArrayList<Put> insPuts = new ArrayList();
-            for (int i = 1; i <= 10; i++) {
+            for (int i = 1; i < 10; i++) {
                 Put putI = new Put(Bytes.toBytes(String.valueOf(i)));
-                putI.addColumn(Bytes.toBytes("f1"), Bytes.toBytes("name"), Bytes.toBytes("my id is " + i));
+                putI.addColumn(Bytes.toBytes("f1"), Bytes.toBytes("name"), Bytes.toBytes("my is no" + i+"."));
                 insPuts.add(putI);
             }
             table.put(insPuts);

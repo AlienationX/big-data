@@ -4,7 +4,7 @@
 <configuration>
   <property>
     <name>hive.metastore.uris</name>
-    <value>thrift://127.0.0.1:9083</value>
+    <value>thrift://hadoop-dev01:9083</value>
   </property>
   <property>
     <name>hive.metastore.client.socket.timeout</name>
@@ -28,11 +28,19 @@
   </property>
   <property>
     <name>hive.optimize.bucketmapjoin.sortedmerge</name>
-    <value>true</value>
+    <value>false</value>
   </property>
   <property>
     <name>hive.smbjoin.cache.rows</name>
     <value>10000</value>
+  </property>
+  <property>
+    <name>hive.server2.logging.operation.enabled</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>hive.server2.logging.operation.log.location</name>
+    <value>/var/log/hive/operation_logs</value>
   </property>
   <property>
     <name>mapred.reduce.tasks</name>
@@ -40,7 +48,7 @@
   </property>
   <property>
     <name>hive.exec.reducers.bytes.per.reducer</name>
-    <value>1073741824</value>
+    <value>67108864</value>
   </property>
   <property>
     <name>hive.exec.copyfile.maxsize</name>
@@ -76,7 +84,7 @@
   </property>
   <property>
     <name>hive.merge.mapredfiles</name>
-    <value>true</value>
+    <value>false</value>
   </property>
   <property>
     <name>hive.cbo.enable</name>
@@ -92,7 +100,7 @@
   </property>
   <property>
     <name>hive.limit.pushdown.memory.usage</name>
-    <value>0.4</value>
+    <value>0.1</value>
   </property>
   <property>
     <name>hive.merge.sparkfiles</name>
@@ -100,7 +108,7 @@
   </property>
   <property>
     <name>hive.merge.smallfiles.avgsize</name>
-    <value>67108864</value>
+    <value>16777216</value>
   </property>
   <property>
     <name>hive.merge.size.per.task</name>
@@ -124,7 +132,7 @@
   </property>
   <property>
     <name>hive.optimize.sort.dynamic.partition</name>
-    <value>true</value>
+    <value>false</value>
   </property>
   <property>
     <name>hive.execution.engine</name>
@@ -132,11 +140,11 @@
   </property>
   <property>
     <name>spark.executor.memory</name>
-    <value>6442450944</value>
+    <value>5708709888</value>
   </property>
   <property>
     <name>spark.driver.memory</name>
-    <value>536870912</value>
+    <value>3865470566</value>
   </property>
   <property>
     <name>spark.executor.cores</name>
@@ -144,11 +152,11 @@
   </property>
   <property>
     <name>spark.yarn.driver.memoryOverhead</name>
-    <value>128</value>
+    <value>409</value>
   </property>
   <property>
     <name>spark.yarn.executor.memoryOverhead</name>
-    <value>2048</value>
+    <value>960</value>
   </property>
   <property>
     <name>spark.dynamicAllocation.enabled</name>
@@ -176,18 +184,10 @@
   </property>
   <property>
     <name>hive.zookeeper.quorum</name>
-    <value>hi-prod-11.hillinsight.com,hi-prod-12.hillinsight.com,hi-prod-16.hillinsight.com</value>
+    <value>hadoop-dev01,hadoop-dev03,hadoop-dev02</value>
   </property>
   <property>
     <name>hive.zookeeper.client.port</name>
-    <value>2181</value>
-  </property>
-  <property>
-    <name>hbase.zookeeper.quorum</name>
-    <value>hi-prod-11.hillinsight.com,hi-prod-12.hillinsight.com,hi-prod-16.hillinsight.com</value>
-  </property>
-  <property>
-    <name>hbase.zookeeper.property.clientPort</name>
     <value>2181</value>
   </property>
   <property>
@@ -195,12 +195,20 @@
     <value>hive_zookeeper_namespace_hive</value>
   </property>
   <property>
+    <name>hbase.zookeeper.quorum</name>
+    <value>hadoop-dev01,hadoop-dev03,hadoop-dev02</value>
+  </property>
+  <property>
+    <name>hbase.zookeeper.property.clientPort</name>
+    <value>2181</value>
+  </property>
+  <property>
     <name>hive.cluster.delegation.token.store.class</name>
     <value>org.apache.hadoop.hive.thrift.MemoryTokenStore</value>
   </property>
   <property>
     <name>hive.server2.enable.doAs</name>
-    <value>false</value>
+    <value>true</value>
   </property>
   <property>
     <name>hive.server2.use.SSL</name>
@@ -213,33 +221,5 @@
   <property>
     <name>hive.mapred.mode</name>
     <value>strict</value>
-  </property>
-  <property>
-    <name>hive.exec.dynamic.partition.mode</name>
-    <value>nonstrict</value>
-  </property>
-  <property>
-    <name>hive.exec.max.dynamic.partitions.pernode</name>
-    <value>1000</value>
-  </property>
-  <property>
-    <name>hive.exec.parallel</name>
-    <value>true</value>
-  </property>
-  <property>
-    <name>hive.mapred.reduce.tasks.speculative.execution</name>
-    <value>false</value>
-  </property>
-  <property>
-    <name>hive.exec.compress.intermediate</name>
-    <value>true</value>
-  </property>
-  <property>
-    <name>hive.intermediate.compression.codec</name>
-    <value>org.apache.hadoop.io.compress.SnappyCodec</value>
-  </property>
-  <property>
-    <name>hive.intermediate.compression.type</name>
-    <value>BLOCK</value>
   </property>
 </configuration>

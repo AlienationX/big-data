@@ -16,7 +16,26 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <hadoop.version>1.6.0-cdh5.16.2</hadoop.version>
     </properties>
+
+    <!--  特殊的maven资料库可以在pom文件单独配置  -->
+    <repositories>
+        <repository>
+            <id>cloudera</id>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -30,61 +49,49 @@
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-exec</artifactId>
-            <version>1.2.2</version>
+            <version>1.1.0-cdh5.16.2</version>
         </dependency>
 
 
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.11</artifactId>
-            <version>1.6.3</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-yarn -->
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-yarn_2.11</artifactId>
-            <version>1.6.3</version>
-            <scope>provided</scope>
+            <artifactId>spark-core_2.10</artifactId>
+            <version>1.6.0-cdh5.16.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_2.11</artifactId>
-            <version>1.6.3</version>
+            <artifactId>spark-sql_2.10</artifactId>
+            <version>1.6.0-cdh5.16.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-hive -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-hive_2.11</artifactId>
-            <version>1.6.3</version>
+            <artifactId>spark-hive_2.10</artifactId>
+            <version>1.6.0-cdh5.16.2</version>
+            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming_2.11</artifactId>
-            <version>1.6.3</version>
+            <artifactId>spark-streaming_2.10</artifactId>
+            <version>1.6.0-cdh5.16.2</version>
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-mllib -->
-        <!-- <dependency>
+        <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-mllib_2.11</artifactId>
-            <version>1.6.3</version>
-        </dependency> -->
-        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-assembly -->
-        <!-- <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-assembly_2.10</artifactId>
-            <version>1.6.3-cdh5.7.1</version>
-            <scope>test</scope>
-        </dependency> -->
+            <artifactId>spark-mllib_2.10</artifactId>
+            <version>1.6.0-cdh5.16.2</version>
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase-client -->
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
-            <version>1.2.11</version>
+            <version>1.2.0-cdh5.16.2</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.hadoop.gplcompression/hadoop-lzo -->
@@ -94,10 +101,17 @@
             <version>cdh4-0.4.15-gplextras</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.hive/hive-jdbc -->
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-jdbc</artifactId>
+            <version>1.1.0-cdh5.16.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.45</version>
+            <version>5.1.48</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
         <dependency>
@@ -106,14 +120,12 @@
             <version>6.2.2.jre8</version>
             <!-- <scope>test</scope> -->
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.oracle/ojdbc6 -->  <!-- oracle jdbc需要收费，只能本地库配置  -->
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.4.0</version>
-            <!-- <scope>test</scope> -->
-        </dependency>
-
+        <!-- https://mvnrepository.com/artifact/oracle/oracle-jdbc -->
+        <!--        <dependency>-->
+        <!--            <groupId>oracle</groupId>-->
+        <!--            <artifactId>oracle-jdbc</artifactId>-->
+        <!--            <version>11.2.0.3.0</version>-->
+        <!--        </dependency>-->
 
         <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
         <dependency>
@@ -121,7 +133,6 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.56</version>
         </dependency>
-
 
     </dependencies>
 
@@ -178,15 +189,6 @@
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                 </configuration>
-                <!--<executions>-->
-                <!--<execution>-->
-                <!--<id>make-assembly</id>-->
-                <!--<phase>package</phase>-->
-                <!--<goals>-->
-                <!--<goal>single</goal>-->
-                <!--</goals>-->
-                <!--</execution>-->
-                <!--</executions>-->
             </plugin>
         </plugins>
 

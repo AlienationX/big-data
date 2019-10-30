@@ -1,4 +1,4 @@
-package com.ego.mr;
+package com.ego.mapreduce;
 
 /**
  * example:
@@ -16,26 +16,31 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.util.GenericOptionsParser;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.StringTokenizer;
 
 public class WordCount {
+    private static Logger logger = Logger.getLogger(WordCount.class);
 
     public static class WordCountMapper extends Mapper<Object, Text, Text, IntWritable> {
-        // private final static IntWritable one = new IntWritable(1);
-        // private Text word = new Text();
+        private final static IntWritable one = new IntWritable(1);
+        private Text word = new Text();
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            // StringTokenizer itr = new StringTokenizer(value.toString());
-            // while (itr.hasMoreTokens()) {
-            //     word.set(itr.nextToken());
-            //     context.write(word, one);
-            // }
-            String[] words = value.toString().split(" ");
-            for (String word : words) {
-                context.write(new Text(word), new IntWritable(1));
+            StringTokenizer itr = new StringTokenizer(value.toString());
+            while (itr.hasMoreTokens()) {
+                word.set(itr.nextToken());
+                context.write(word, one);
+                logger.info("{\"" + word + "\": "+ one+"}");
             }
+            // String[] words = value.toString().replaceAll(" +", " ").split(" ");
+            // for (String word : words) {
+            //     if (!"".equals(word.trim())) {
+            //         context.write(new Text(word), new IntWritable(1));
+            //     }
+            // }
         }
     }
 
@@ -51,14 +56,25 @@ public class WordCount {
             // context.write(key, result);
             context.write(key, new IntWritable(sum));
         }
-
     }
 
     public static void main(String[] args) throws Exception {
-        // System.setProperty("HADOOP_USER_NAME", "lshu");
-        // System.setProperty("hadoop.home.dir", "/Users/MacBook/Software/soft/CDH/hadoop-2.7.1");
+        System.setProperty("HADOOP_USER_NAME", "work");
+        // 不添加yarn-site.xml等文件，使用本地模式运行时需要设置hadoop.home.dir路径
+        // System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-2.6.0");
+        // Could not locate executablenull\bin\winutils.exe in the Hadoop binaries。Windows下的特殊配置
+        System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-common-2.6.0-bin");
 
         Configuration conf = new Configuration();
+        // 如果要从windows系统中运行这个job提交客户端的程序，则需要加这个跨平台提交的参数
+        conf.set("mapreduce.app-submission.cross-platform", "true");
+
+        // 如果文件位置无法识别，需要手动添加
+        // conf.addResource("core-site.xml");
+        // conf.addResource("hdfs-site.xml");
+        // conf.addResource("mapred-site.xml");
+        // conf.addResource("yarn-site.xml");
+
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
         if (otherArgs.length != 2) {
             System.err.println("Usage: wordcount <in> <out>");
@@ -66,26 +82,34 @@ public class WordCount {
         }
 
         // 删除output路径
-        Path path = new Path("tmp/output");
+        Path path = new Path("tmp/output_wordcount");
+        // Path path = new Path(otherArgs[1]);
         FileSystem fs = path.getFileSystem(conf);
         if (fs.exists(path)) {
             fs.delete(path, true);
             System.out.println("output path is deleted");
         }
 
+        Job job = Job.getInstance(conf);
+        job.setJobName("WordCount");
+        job.setNumReduceTasks(1);
 
-        // Job job = new Job(conf, "word count");   // 老代码，不推荐的，废弃的
-        Job job = Job.getInstance();
-        job.setJobName("word count");
-        job.setJarByClass(WordCount.class);
+        // Error: java.lang.RuntimeException: java.lang.ClassNotFoundException: Class com.ego.mr.Example$TokenizerMapper not found
+        // 远程提交yarn集群需要指定打包的文件，否则会报mapper、reducer类 not found
+        job.setJar("target/bigdata-1.0-SNAPSHOT.jar");
+        // 打包已经编译成class文件了，所以上传集群直接指定类运行即可
+        // job.setJarByClass(WordCount.class);
+
         job.setMapperClass(WordCountMapper.class);
-        // ??? 这个必须设置吗，还不太清楚
-        // job.setCombinerClass(WordCountReducer.class);
+        job.setCombinerClass(WordCountReducer.class);
         job.setReducerClass(WordCountReducer.class);
+
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
+
         FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
         FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
+
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 

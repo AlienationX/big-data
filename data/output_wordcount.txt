@@ -1,0 +1,10 @@
+R	1
+bye	3
+c#	1
+c++	1
+hi	1
+java	5
+javascript	2
+perl	1
+python	4
+ruby	1

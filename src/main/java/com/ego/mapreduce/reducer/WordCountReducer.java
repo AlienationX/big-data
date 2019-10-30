@@ -1,4 +1,4 @@
-package com.ego.mr.reducer;
+package com.ego.mapreduce.reducer;
 
 
 import org.apache.hadoop.io.IntWritable;

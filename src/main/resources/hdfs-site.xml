@@ -4,15 +4,15 @@
 <configuration>
   <property>
     <name>dfs.namenode.name.dir</name>
-    <value>file:///data/0/dfs/nn,file:///data/1/dfs/nn</value>
+    <value>file:///dfs/nn</value>
   </property>
   <property>
     <name>dfs.namenode.servicerpc-address</name>
-    <value>127.0.0.1:8022</value>
+    <value>hadoop-dev01:8022</value>
   </property>
   <property>
     <name>dfs.https.address</name>
-    <value>127.0.0.1:50470</value>
+    <value>hadoop-dev01:50470</value>
   </property>
   <property>
     <name>dfs.https.port</name>
@@ -20,7 +20,7 @@
   </property>
   <property>
     <name>dfs.namenode.http-address</name>
-    <value>127.0.0.1:50070</value>
+    <value>hadoop-dev01:50070</value>
   </property>
   <property>
     <name>dfs.replication</name>
@@ -28,7 +28,7 @@
   </property>
   <property>
     <name>dfs.blocksize</name>
-    <value>67108864</value>
+    <value>134217728</value>
   </property>
   <property>
     <name>dfs.client.use.datanode.hostname</name>
@@ -40,7 +40,7 @@
   </property>
   <property>
     <name>dfs.namenode.acls.enabled</name>
-    <value>true</value>
+    <value>false</value>
   </property>
   <property>
     <name>dfs.client.use.legacy.blockreader</name>
