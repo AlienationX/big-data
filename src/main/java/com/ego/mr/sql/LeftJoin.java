@@ -1,4 +1,4 @@
-package com.ego.mapreduce;
+package com.ego.mr.sql;
 
 public class LeftJoin {
 }

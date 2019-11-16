@@ -1,8 +1,8 @@
-package com.ego.mapreduce;
+package com.ego.mr;
 
 /**
  * example:
- * hadoop jar bigdata-1.0-SNAPSHOT-jar-with-dependencies.jar com.ego.mr.WordCount tmp/word.txt tmp/output
+ * hadoop jar bigdata-1.0-SNAPSHOT-jar-with-dependencies.jar com.ego.mr.WordCount tmp/input_wordcount tmp/output_wordcount
  */
 
 import org.apache.hadoop.conf.Configuration;
@@ -19,6 +19,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.StringTokenizer;
 
 public class WordCount {
@@ -33,7 +34,7 @@ public class WordCount {
             while (itr.hasMoreTokens()) {
                 word.set(itr.nextToken());
                 context.write(word, one);
-                logger.info("{\"" + word + "\": "+ one+"}");
+                logger.info("{\"" + word + "\": " + one + "}");
             }
             // String[] words = value.toString().replaceAll(" +", " ").split(" ");
             // for (String word : words) {
@@ -82,9 +83,9 @@ public class WordCount {
         }
 
         // 删除output路径
+        FileSystem fs = FileSystem.get(conf);
         Path path = new Path("tmp/output_wordcount");
         // Path path = new Path(otherArgs[1]);
-        FileSystem fs = path.getFileSystem(conf);
         if (fs.exists(path)) {
             fs.delete(path, true);
             System.out.println("output path is deleted");
@@ -96,9 +97,14 @@ public class WordCount {
 
         // Error: java.lang.RuntimeException: java.lang.ClassNotFoundException: Class com.ego.mr.Example$TokenizerMapper not found
         // 远程提交yarn集群需要指定打包的文件，否则会报mapper、reducer类 not found
-        job.setJar("target/bigdata-1.0-SNAPSHOT.jar");
+        // job.setJar("target/bigdata-1.0-SNAPSHOT.jar");
         // 打包已经编译成class文件了，所以上传集群直接指定类运行即可
         // job.setJarByClass(WordCount.class);
+        if (InetAddress.getLocalHost().getHostName().equals("Dell")) {
+            job.setJar("target/bigdata-1.0-SNAPSHOT.jar");
+        } else {
+            job.setJarByClass(WordCount.class);
+        }
 
         job.setMapperClass(WordCountMapper.class);
         job.setCombinerClass(WordCountReducer.class);

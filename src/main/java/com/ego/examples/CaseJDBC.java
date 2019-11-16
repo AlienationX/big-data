@@ -68,6 +68,9 @@ public class CaseJDBC {
             logger.info("-------------------------------------");
             String sqlStr = "select table_schema,table_name,engine,row_format,table_collation,table_rows,create_time from information_schema.tables where table_schema=? and table_type=?";
             PreparedStatement pstmt = conn.prepareStatement(sqlStr);
+            System.out.println(pstmt.getParameterMetaData());
+            System.out.println(pstmt.getMetaData());
+            System.out.println(pstmt.getClass());
             pstmt.setString(1, "test");
             pstmt.setString(2, "BASE TABLE");
             ResultSet resultSet = pstmt.executeQuery();
