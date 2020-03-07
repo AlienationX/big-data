@@ -16,11 +16,11 @@ public class CaseProperties {
         sysProp.list(System.out);
 
         // read
-        InputStream in = new FileInputStream("conf/mysql.properties");
+        InputStream in = new FileInputStream("conf/db.properties");
         Properties prop = new Properties();
         prop.load(in);
         System.out.println("-- custom properties --");
-        System.out.println(prop.getProperty("jdbc.username"));
+        System.out.println("jdbc.mysql.local.username --> " + prop.getProperty("jdbc.mysql.local.username"));
         for (Object key : prop.keySet()) {
             System.out.println(key + "=" + prop.get(key));
         }

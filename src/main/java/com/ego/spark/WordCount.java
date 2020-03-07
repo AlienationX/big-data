@@ -1,14 +1,10 @@
 package com.ego.spark;
 
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
@@ -34,19 +30,26 @@ public class WordCount {
                 .builder()
                 .master("local")
                 .appName("JavaWordCount")
+                .config("spark.some.config.option", "some-value")
                 .enableHiveSupport()
                 .getOrCreate();
 
-        JavaRDD<String> lines = spark.read().textFile("hdfs:///user/work/tmp/input_wordcount").javaRDD();
-        System.out.println(lines);
-
-        JavaRDD words = lines.flatMap(s -> Arrays.asList(s.split(" ")).iterator());
-        System.out.println(words);
-
-        Dataset<Row> ds = spark.sql("show databases");
-        ds.show();
-        spark.sql("select * from medical.dim_date limit 100").show();
+        runHelloWorld(spark);
 
         spark.stop();
     }
+
+    private static void runHelloWorld(SparkSession spark) {
+        JavaRDD<String> lines = spark.read().textFile("file:///E:/Codes/Java/big-data/data/word.txt").javaRDD();
+        // JavaRDD<String> lines = spark.read().textFile("hdfs:///user/work/tmp/input_wordcount").javaRDD();
+        System.out.println(lines.collect());
+
+        JavaRDD<String> words = lines.flatMap(s -> Arrays.asList(s.split(" ")).iterator());
+        System.out.println(words.collect());
+
+        // Dataset<Row> ds = spark.sql("show databases");
+        // ds.show();
+        // spark.sql("select * from medical.dim_date limit 100").show();
+    }
+
 }

@@ -22,6 +22,7 @@
 
     <!--  特殊的maven资料库可以在pom文件单独配置  -->
     <repositories>
+        <!-- Cloudera相关jar包 -->
         <repository>
             <id>cloudera</id>
             <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
@@ -32,9 +33,15 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <!-- Spring相关jar包 -->
         <repository>
             <id>spring-releases</id>
             <url>https://repo.spring.io/libs-release</url>
+        </repository>
+        <!-- Oracle相关jar包 -->
+        <repository>
+            <id>Datanucleus</id>
+            <url>http://www.datanucleus.org/downloads/maven2/</url>
         </repository>
     </repositories>
 
@@ -59,6 +66,14 @@
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
             <version>1.2.0-cdh5.16.2</version>
+        </dependency>
+
+
+        <!-- https://mvnrepository.com/artifact/org.apache.solr/solr-solrj -->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj</artifactId>
+            <version>4.10.3-cdh5.16.2</version>
         </dependency>
 
 
@@ -94,6 +109,7 @@
             <artifactId>spark-yarn_2.11</artifactId>
             <version>2.4.0.cloudera2</version>
         </dependency>
+
 
         <!-- spark2.4依赖冲突需要单独下载的jar -->
         <!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
@@ -158,6 +174,12 @@
             <artifactId>hive-jdbc</artifactId>
             <version>1.1.0-cdh5.16.2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.cloudera/ImpalaJDBC41 -->
+        <!--<dependency>-->
+        <!--    <groupId>com.cloudera</groupId>-->
+        <!--    <artifactId>ImpalaJDBC41</artifactId>-->
+        <!--    <version>2.6.3</version>-->
+        <!--</dependency>-->
         <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
         <dependency>
             <groupId>mysql</groupId>
@@ -178,6 +200,13 @@
         <!--            <version>11.2.0.3.0</version>-->
         <!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
+        <!-- https://mvnrepository.com/artifact/oracle/ojdbc6 -->
+        <!--<dependency>-->
+        <!--    <groupId>oracle</groupId>-->
+        <!--    <artifactId>ojdbc6</artifactId>-->
+        <!--    <version>11.2.0.3</version>-->
+        <!--</dependency>-->
+
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>

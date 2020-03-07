@@ -15,10 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HiveJDBC {
-
+public class ImpalaJDBC {
     // private Logger logger = Logger.getLogger(this.getClass());
-    private static Logger logger = Logger.getLogger(CaseJDBC.class);
+    private static Logger logger = Logger.getLogger(ImpalaJDBC.class);
 
     // Oracle："oracle.jdbc.driver.OracleDriver" "jdbc:oracle:thin:@localhost:1521:db"
     // SqlServer2000："com.microsoft.jdbc.sqlserver.SQLServerDriver" "jdbc:microsoft:sqlserver://localhost:1433; DatabaseName=db"
@@ -26,8 +25,8 @@ public class HiveJDBC {
     // MySql："com.mysql.jdbc.Driver" "jdbc:mysql://localhost:3306/db"
 
     // Hive
-    private static String JDBC_DRIVER = "org.apache.hive.jdbc.HiveDriver";
-    private static String URL = "jdbc:hive2://hadoop-dev01:10000/default";
+    private static String JDBC_DRIVER = "com.cloudera.impala.jdbc41.Driver";
+    private static String URL = "jdbc:impala://hadoop-dev03:21050";
     private static String USER = "work";
     private static String PWD = "";
 
@@ -44,7 +43,7 @@ public class HiveJDBC {
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 // System.out.println(rs.getString("table_name"));
-                logger.info(rs.getString("database_name"));
+                logger.info(rs.getString("name"));
             }
 
             logger.info("-------------------------------------");
