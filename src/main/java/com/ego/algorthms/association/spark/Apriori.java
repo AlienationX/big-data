@@ -1,4 +1,4 @@
-package com.ego.spark.datamining;
+package com.ego.algorthms.association.spark;
 
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.Dataset;

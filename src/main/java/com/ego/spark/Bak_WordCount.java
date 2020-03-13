@@ -42,7 +42,7 @@
 //        // sparkConf.set("spark.yarn.dist.files", "src/main/java/yarn-site.xml");
 //        // sparkConf.set("spark.driver.host", "127.0.0.1");
 //        // sparkConf.set("spark.yarn.preserve.staging.files", "false");
-//        // sparkConf.set("yarn.resourcemanager.hostname", "hi-prod-09.hillinsight.com");
+//        // sparkConf.set("yarn.resourcemanager.hostname", "hadoop-prod09");
 //        // sparkConf.set("spark.ui.port", "36000");
 //        System.out.println("A");
 //        // 设置运行资源参数
@@ -64,9 +64,9 @@
 //        // // com.microsoft.sqlserver.jdbc.SQLServerDriver（2005版本及以后）
 //        // // com.microsoft.jdbc.sqlserver.SQLServerDriver（2000版本）
 //        // mssqlConf.put("driver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"); // 必须填加 否则报错 java.sql.SQLException:No suitable driver
-//        // mssqlConf.put("url", "jdbc:sqlserver://10.15.1.11:2121;database=PMS");
-//        // mssqlConf.put("user", "warmsoft_read");
-//        // mssqlConf.put("password", "Awq123456");
+//        // mssqlConf.put("url", "jdbc:sqlserver://127.0.0.1:2121;database=PMS");
+//        // mssqlConf.put("user", "sa");
+//        // mssqlConf.put("password", "sa123");
 //
 //        mssqlConf = new DBConfig("com.microsoft.sqlserver.jdbc.SQLServerDriver", "jdbc:sqlserver://10.15.1.11:2121;database=PMS", "warmsoft_read", "Awq123456");
 //        mysqlConf = new DBConfig("com.mysql.jdbc.Driver", "jdbc:mysql://10.15.1.14:3306/xiaonuan?useUnicode=true&characterEncoding=utf-8", "work", "phkAmwrF");
@@ -205,9 +205,9 @@
 //        //
 //        // Map<String, String> options = new HashMap<String, String>();
 //        // options.put("driver", "com.mysql.jdbc.Driver");
-//        // options.put("url", "jdbc:mysql://10.15.1.14:3306/xiaonuan");
-//        // options.put("user", "warmsoft_read");
-//        // options.put("password", "phkAmwrF");
+//        // options.put("url", "jdbc:mysql://127.0.0.1:3306/xiaonuan");
+//        // options.put("user", "root");
+//        // options.put("password", "root123");
 //        // options.put("dbtable", "lshu_syspmsusers");
 //        //
 //        // DataFrame df_belle_comparison_online2offline_new = sqlContext.read().format("jdbc").options(options).load();
