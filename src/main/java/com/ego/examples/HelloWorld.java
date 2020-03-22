@@ -20,5 +20,13 @@ public class HelloWorld {
 
         String[] values = {"beijing", "shanghai", "shenzhen"};
         System.out.println(String.join("\t", values));
+
+        // 精确小数位
+        int x = 2;
+        int y = 3;
+        float z = x / y;
+        System.out.println((float) x / y);
+        System.out.println(z);
+        System.out.println(String.format("%.2f", (float) x / y));
     }
 }

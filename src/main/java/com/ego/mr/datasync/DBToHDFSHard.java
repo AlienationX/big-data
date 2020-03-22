@@ -1,4 +1,4 @@
-package com.ego.mr.data;
+package com.ego.mr.datasync;
 
 
 import org.apache.hadoop.conf.Configuration;

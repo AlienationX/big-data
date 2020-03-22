@@ -1,11 +1,20 @@
 package com.ego.spark;
 
+import org.apache.hadoop.io.NullWritable;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.PairFlatMapFunction;
+import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.storage.StorageLevel;
+import scala.Tuple2;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class WordCount {
@@ -42,14 +51,74 @@ public class WordCount {
     private static void runHelloWorld(SparkSession spark) {
         JavaRDD<String> lines = spark.read().textFile("file:///E:/Codes/Java/big-data/data/word.txt").javaRDD();
         // JavaRDD<String> lines = spark.read().textFile("hdfs:///user/work/tmp/input_wordcount").javaRDD();
+        lines.persist(StorageLevel.DISK_ONLY());
         System.out.println(lines.collect());
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // map & reduce
+        // flatMap & mapToPair
         JavaRDD<String> words = lines.flatMap(s -> Arrays.asList(s.split(" ")).iterator());
         System.out.println(words.collect());
 
-        // Dataset<Row> ds = spark.sql("show databases");
-        // ds.show();
-        // spark.sql("select * from medical.dim_date limit 100").show();
+        // STEP-1: map
+        JavaPairRDD<String, Integer> ones = words.mapToPair(s -> new Tuple2<>(s, 1));
+        // JavaPairRDD<String, Integer> ones = words.mapToPair(new PairFunction<String, String, Integer>() {
+        //     @Override
+        //     public Tuple2<String, Integer> call(String s) throws Exception {
+        //         return new Tuple2<>(s, 1);
+        //     }
+        // });
+        // lambda
+        // JavaPairRDD<String, Integer> ones = words.mapToPair((PairFunction<String, String, Integer>) s -> {
+        //     return new Tuple2<>(s, 1);
+        // });
+        // JavaPairRDD<String, Integer> counts = ones.reduceByKey((i1, i2) -> i1 + i2);
+
+        // STEP-2: reduce
+        JavaPairRDD<String, Integer> counts = ones.reduceByKey(Integer::sum);
+        System.out.println(counts.collect());
+
+        List<Tuple2<String, Integer>> output = counts.filter(s -> !"".equals(s._1())).collect();
+        for (Tuple2<?, ?> tuple : output) {
+            System.out.println(tuple._1() + ": " + tuple._2());
+        }
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // flatMapToPair, no reduceByKey
+        JavaPairRDD<String, Integer> wordPairRDD = lines.flatMapToPair(new PairFlatMapFunction<String, String, Integer>() {
+            @Override
+            public Iterator<Tuple2<String, Integer>> call(String s) throws Exception {
+                List<Tuple2<String, Integer>> output = new ArrayList<>();
+                String[] line = s.split(" ");
+                for (String value : line) {
+                    if ("".equals(value)) {
+                        continue;
+                    }
+                    Tuple2<String, Integer> tuple = new Tuple2<>(value, 1);
+                    output.add(tuple);
+                }
+                return output.iterator();
+            }
+        });
+        JavaPairRDD<String, Integer> wordByKey = wordPairRDD.reduceByKey(Integer::sum);
+        System.out.println("------------");
+        wordByKey.foreach(new VoidFunction<Tuple2<String, Integer>>() {
+            @Override
+            public void call(Tuple2<String, Integer> tuple2) throws Exception {
+                System.out.println(tuple2._1 + ": " + tuple2._2);
+            }
+        });
+
+
+        // JavaPairRDD convert JavaRDD
+        JavaRDD<String> javaRDD = wordPairRDD.map(new Function<Tuple2<String, Integer>, String>() {
+            public String call(Tuple2<String, Integer> t) throws Exception {
+                return t._1 + ": " + t._2;
+            }
+        });
+        System.out.println(javaRDD.collect());
+
     }
 
 }
