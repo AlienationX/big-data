@@ -40,7 +40,7 @@ public class FindAssociationRules {
         // sqlDF.show(10);
         // sqlDF.select("items").show(10);
         // sqlDF.select(col("visitid"), col("items")).show(5);
-        return sqlDF.select("items").limit(100);
+        return sqlDF.select("items");
     }
 
     public static JavaRDD<Row> createLk(SparkSession spark, JavaRDD<Row> transactions, long rowNum, double minSupport, int k) {
@@ -104,7 +104,7 @@ public class FindAssociationRules {
         // 持久化缓存 sqlDF.persist();
         df.cache();
         long rowNum = df.count();
-        System.out.println(rowNum);
+        System.out.println("Total Rows: " + rowNum);
         df.show(10);
 
         // JavaRDD<String> transactions = df.toJavaRDD().map(s -> s.get(0));
@@ -132,7 +132,7 @@ public class FindAssociationRules {
                 break;
             }
             Dataset<Row> frequentSetDS = spark.createDataFrame(frequentSetRDD, schema);
-            frequentSetDF.unionAll(frequentSetDS);
+            frequentSetDF = frequentSetDF.unionAll(frequentSetDS);
         }
 
         // save
