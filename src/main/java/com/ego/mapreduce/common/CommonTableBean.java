@@ -1,4 +1,4 @@
-package com.ego.mr.common;
+package com.ego.mapreduce.common;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;

@@ -1,4 +1,4 @@
-package com.ego.mr.datasync;
+package com.ego.mapreduce.datasync;
 
 
 import org.apache.hadoop.conf.Configuration;
@@ -16,7 +16,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import com.ego.mr.common.CommonTableBean;
+import com.ego.mapreduce.common.CommonTableBean;
 
 /**
  * from database import table to HDFS

@@ -1,6 +1,8 @@
 package com.ego.algorthms.association.spark;
 
+
 import com.ego.algorthms.association.Combination;
+import com.ego.HadoopUtil;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -151,8 +153,6 @@ public class FindAssociationRules {
     }
 
     public static void main(String[] args) {
-        System.setProperty("HADOOP_USER_NAME", "work");
-        System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-common-2.6.0-bin");
 
         // STEP-1: handle input parameters
         if (args.length < 2) {
@@ -165,13 +165,7 @@ public class FindAssociationRules {
         // String colName = args[3];
 
         // STEP-2: create a SparkSession
-        SparkSession spark = SparkSession
-                .builder()
-                .master("local")
-                .appName("Find Association Rules")
-                .config("spark.some.config.option", "some-value")
-                .enableHiveSupport()
-                .getOrCreate();
+        SparkSession spark = HadoopUtil.createSparkSession("Find Association Rules");
 
         runFindFrequentSet(spark, minSupport);
         runFindAssociationRules(spark, minConfidence);

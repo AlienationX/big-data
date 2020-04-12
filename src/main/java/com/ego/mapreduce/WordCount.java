@@ -1,9 +1,11 @@
-package com.ego.mr;
+package com.ego.mapreduce;
 
 /**
  * example:
  * hadoop jar bigdata-1.0-SNAPSHOT-jar-with-dependencies.jar com.ego.mr.WordCount tmp/input_wordcount tmp/output_wordcount
  */
+
+import com.ego.HadoopUtil;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -19,8 +21,8 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.StringTokenizer;
+
 
 public class WordCount {
     private static Logger logger = Logger.getLogger(WordCount.class);
@@ -29,6 +31,7 @@ public class WordCount {
         private final static IntWritable one = new IntWritable(1);
         private Text word = new Text();
 
+        @Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             StringTokenizer itr = new StringTokenizer(value.toString());
             while (itr.hasMoreTokens()) {
@@ -48,6 +51,7 @@ public class WordCount {
     public static class WordCountReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // private IntWritable result = new IntWritable();
 
+        @Override
         public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
             int sum = 0;
             for (IntWritable value : values) {
@@ -60,11 +64,9 @@ public class WordCount {
     }
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("HADOOP_USER_NAME", "work");
-        // 不添加yarn-site.xml等文件，使用本地模式运行时需要设置hadoop.home.dir路径
-        // System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-2.6.0");
-        // Could not locate executablenull\bin\winutils.exe in the Hadoop binaries。Windows下的特殊配置
-        System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-common-2.6.0-bin");
+
+        // 设置环境变量
+        HadoopUtil.setEnvironment();
 
         Configuration conf = new Configuration();
         // 如果要从windows系统中运行这个job提交客户端的程序，则需要加这个跨平台提交的参数
@@ -78,7 +80,7 @@ public class WordCount {
 
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
         if (otherArgs.length != 2) {
-            System.err.println("Usage: wordcount <in> <out>");
+            System.err.println("Usage: word count <in> <out>");
             System.exit(2);
         }
 
@@ -100,7 +102,7 @@ public class WordCount {
         // job.setJar("target/bigdata-1.0-SNAPSHOT.jar");
         // 打包已经编译成class文件了，所以上传集群直接指定类运行即可
         // job.setJarByClass(WordCount.class);
-        if (InetAddress.getLocalHost().getHostName().equals("Dell")) {
+        if (HadoopUtil.isDevelopment()) {
             job.setJar("target/bigdata-1.0-SNAPSHOT.jar");
         } else {
             job.setJarByClass(WordCount.class);
