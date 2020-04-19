@@ -8,7 +8,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hive.hcatalog.common.HCatException;
+import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hive.hcatalog.data.HCatRecord;
 import org.apache.hive.hcatalog.data.schema.HCatSchema;
 import org.apache.hive.hcatalog.mapreduce.HCatInputFormat;
@@ -42,13 +42,16 @@ public class HiveToEs {
 
     public static void main(String[] args) throws Exception {
 
-        if (args.length != 2) {
+        Configuration conf = HadoopUtil.getConf();
+
+        String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
+        if (otherArgs.length != 2) {
             System.err.println("Usage: datasync hive to es <inputTable> <outputIndex>");
             System.exit(2);
         }
 
-        String input = args[0];
-        String indexName = args[1];
+        String input = otherArgs[0];
+        String indexName = otherArgs[1];
 
         String dbName = "default";
         String tableName;
@@ -59,7 +62,6 @@ public class HiveToEs {
             tableName = input;
         }
 
-        Configuration conf = HadoopUtil.getConf();
         conf.set("es.resource", indexName);
         Job job = Job.getInstance(conf, "Hive To Es: " + tableName + " --> " + indexName);
 

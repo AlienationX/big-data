@@ -53,15 +53,16 @@ public class WordCountES {
         // 设置环境变量
         HadoopUtil.setEnvironment();
 
-        if (args.length != 2) {
-            System.err.println("Usage: elasticsearch word count <in> <out>");
-            System.exit(2);
-        }
-
         Configuration conf = new Configuration();
         conf.set("mapreduce.app-submission.cross-platform", "true");
         conf.set("es.nodes", "hadoop-dev04:9200");
-        conf.set("es.resource", args[1]);
+
+        String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
+        if (otherArgs.length != 2) {
+            System.err.println("Usage: elasticsearch word count <in> <out>");
+            System.exit(2);
+        }
+        conf.set("es.resource", otherArgs[1]);
 
         // conf.set("es.batch.size.entries", "1"); //
         // conf.set("es.batch.write.retry.count", "3"); //  默认是重试3次,为负值的话为无限重试(慎用)
@@ -82,7 +83,7 @@ public class WordCountES {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 
-        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
         job.setOutputFormatClass(EsOutputFormat.class);
 
         System.exit(job.waitForCompletion(true) ? 0 : 1);

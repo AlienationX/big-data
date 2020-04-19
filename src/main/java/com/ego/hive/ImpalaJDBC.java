@@ -24,9 +24,12 @@ public class ImpalaJDBC {
     // SqlServer2005："com.microsoft.sqlserver.jdbc.SQLServerDriver" "jdbc:sqlserver://localhost:1433;DatabaseName=db"
     // MySql："com.mysql.jdbc.Driver" "jdbc:mysql://localhost:3306/db"
 
-    // Hive
+    // impala JDBC有2种访问方式，一种是使用hive2 jdbc访问， 一种使用impala 自己的JDBC访问
+    // private static String JDBC_DRIVER = "org.apache.hive.jdbc.HiveDriver";
+    // private static String URL = "jdbc:hive2://hadoop-dev03:21050/;auth=noSasl";  // 使用hive2访问impala
+
     private static String JDBC_DRIVER = "com.cloudera.impala.jdbc41.Driver";
-    private static String URL = "jdbc:impala://hadoop-dev03:21050";
+    private static String URL = "jdbc:impala://hadoop-dev03:21050";           // 使用impala，推荐
     private static String USER = "work";
     private static String PWD = "";
 

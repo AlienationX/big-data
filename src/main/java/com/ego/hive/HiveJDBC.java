@@ -27,7 +27,8 @@ public class HiveJDBC {
 
     // Hive
     private static String JDBC_DRIVER = "org.apache.hive.jdbc.HiveDriver";
-    private static String URL = "jdbc:hive2://hadoop-dev01:10000/default";
+    private static String URL = "jdbc:hive2://hadoop-dev01:10000/default";    // hive
+    // private static String URL = "jdbc:hive2://hadoop-dev03:21050/;auth=noSasl";  // 可以直接使用impala
     private static String USER = "work";
     private static String PWD = "";
 
@@ -43,8 +44,9 @@ public class HiveJDBC {
             String sql = "show databases";
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                // System.out.println(rs.getString("table_name"));
-                logger.info(rs.getString("database_name"));
+                // System.out.println(rs.getString("table_name"));  // mysql
+                logger.info(rs.getString("database_name"));  // hive
+                // logger.info(rs.getString("name"));  // impala
             }
 
             logger.info("-------------------------------------");
