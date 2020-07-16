@@ -1,32 +1,25 @@
 package com.ego.mapreduce.sql;
 
 
-import com.ego.HadoopUtil;
-import com.ego.mapreduce.WordCount;
-import com.ego.mapreduce.WordCountES;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hive.hcatalog.data.DefaultHCatRecord;
 import org.apache.hive.hcatalog.data.HCatRecord;
-
 import org.apache.hive.hcatalog.data.schema.HCatSchema;
 import org.apache.hive.hcatalog.mapreduce.HCatInputFormat;
 import org.apache.hive.hcatalog.mapreduce.HCatOutputFormat;
 import org.apache.hive.hcatalog.mapreduce.OutputJobInfo;
 import org.apache.log4j.Logger;
-import org.elasticsearch.hadoop.mr.EsOutputFormat;
 
 import java.io.IOException;
 import java.util.Iterator;
+
+import com.ego.HadoopUtil;
 
 /**
  * create table tmp.mr_group stored as parquet as
@@ -37,12 +30,12 @@ import java.util.Iterator;
  * select 'mike' as name,'2020-01-01' as dt,'bread' as item,12.5 as amount union all
  * select 'mike' as name,'2020-01-02' as dt,'orange' as item,6 as amount union all
  * select 'mike' as name,'2020-01-03' as dt,'orange' as item,6 as amount;
- * <p>
+ *
  * select name,
- * count(distinct item) as item_num,
- * sum(amount) as sum_amount,
- * avg(amount) as avg_amount,
- * max(amount) as min_amount
+ *        count(distinct item) as item_num,
+ *        sum(amount) as sum_amount,
+ *        avg(amount) as avg_amount,
+ *        max(amount) as min_amount
  * from tmp.mr_group
  * group by name;
  */
@@ -66,8 +59,8 @@ public class GroupBy {
             HCatRecord record = new DefaultHCatRecord();
 
 
-            record.setString("item", fromSchema,value.get("item", fromSchema).toString());
-            record.setDouble("amount", fromSchema, (double) value.get("amount",fromSchema));
+            record.setString("item", fromSchema, value.get("item", fromSchema).toString());
+            record.setDouble("amount", fromSchema, (double) value.get("amount", fromSchema));
             context.write(new Text(name), record);
         }
 
@@ -86,7 +79,7 @@ public class GroupBy {
 
 
             Iterator<HCatRecord> iter = values.iterator();
-            while (iter.hasNext()){
+            while (iter.hasNext()) {
 
             }
             HCatRecord record = new DefaultHCatRecord();
@@ -122,10 +115,10 @@ public class GroupBy {
         job.setOutputValueClass(DefaultHCatRecord.class);
         // job.setOutputValueClass(HCatRecord.class);
 
-        HCatInputFormat.setInput(job,"tmp","mr_group");
+        HCatInputFormat.setInput(job, "tmp", "mr_group");
         job.setInputFormatClass(HCatInputFormat.class);
 
-        HCatOutputFormat.setOutput(job, OutputJobInfo.create("tmp","mr_group_result",null));
+        HCatOutputFormat.setOutput(job, OutputJobInfo.create("tmp", "mr_group_result", null));
         job.setOutputFormatClass(HCatOutputFormat.class);
 
         System.exit(job.waitForCompletion(true) ? 0 : 1);
