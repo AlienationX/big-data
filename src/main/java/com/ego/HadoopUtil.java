@@ -1,6 +1,8 @@
 package com.ego;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.spark.sql.SparkSession;
 
 import java.io.FileInputStream;
@@ -14,7 +16,7 @@ import java.util.Properties;
 
 public class HadoopUtil {
 
-    public final static String JAR_NAME = "target/bigdata-1.0-SNAPSHOT.jar";
+    public final static String LOCAL_JAR_NAME = "target/bigdata-1.0-SNAPSHOT.jar";
 
     public static boolean isDevelopment() {
         try {
@@ -54,7 +56,8 @@ public class HadoopUtil {
 
         Map<String, String> confMap = new HashMap<>();
         try {
-            InputStream in = new FileInputStream(file);
+            // InputStream in = new FileInputStream(file);
+            InputStream in = HadoopUtil.class.getClassLoader().getResourceAsStream(file);
             Properties prop = new Properties();
             prop.load(in);
             for (Object key : prop.keySet()) {
@@ -66,6 +69,18 @@ public class HadoopUtil {
         return confMap;
     }
 
+    public static void addTmpJars(Job job) {
+        Map<String, String> mapConf = getConfMap();
+        try {
+            String tmpJarsPathKey = "tmp.jars.path";
+            if (mapConf.containsKey(tmpJarsPathKey)) {
+                job.addFileToClassPath(new Path(mapConf.get(tmpJarsPathKey)));
+                System.out.println("Add " + mapConf.get(tmpJarsPathKey) + "to Class Path");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static Configuration getConf() {
         Configuration conf = new Configuration();

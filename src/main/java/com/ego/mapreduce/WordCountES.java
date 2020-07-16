@@ -58,7 +58,7 @@ public class WordCountES {
         conf.set("es.nodes", "hadoop-dev04:9200");
 
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-        if (otherArgs.length != 2) {
+        if (otherArgs.length < 2) {
             System.err.println("Usage: elasticsearch word count <in> <out>");
             System.exit(2);
         }
@@ -71,6 +71,7 @@ public class WordCountES {
 
         Job job = Job.getInstance(conf);
         job.setNumReduceTasks(1);
+        HadoopUtil.addTmpJars(job);
 
         if (HadoopUtil.isDevelopment()) {
             job.setJar("target/bigdata-1.0-SNAPSHOT.jar");

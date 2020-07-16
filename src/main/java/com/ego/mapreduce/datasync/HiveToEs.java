@@ -13,6 +13,7 @@ import org.apache.hive.hcatalog.data.HCatRecord;
 import org.apache.hive.hcatalog.data.schema.HCatSchema;
 import org.apache.hive.hcatalog.mapreduce.HCatInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 
 import java.io.IOException;
 
@@ -45,7 +46,7 @@ public class HiveToEs {
         Configuration conf = HadoopUtil.getConf();
 
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-        if (otherArgs.length != 2) {
+        if (otherArgs.length < 2) {
             System.err.println("Usage: datasync hive to es <inputTable> <outputIndex>");
             System.exit(2);
         }
@@ -67,7 +68,7 @@ public class HiveToEs {
 
 
         if (HadoopUtil.isDevelopment()) {
-            job.setJar(HadoopUtil.JAR_NAME);
+            job.setJar(HadoopUtil.LOCAL_JAR_NAME);
         } else {
             job.setJarByClass(HiveToEs.class);
         }

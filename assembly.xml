@@ -2,10 +2,11 @@
     <id>assembly</id>
 
     <formats>
-        <format>tar.gz</format>
+        <format>jar</format>
+        <!--<format>tar.gz</format>-->
     </formats>
 
-    <includeBaseDirectory>true</includeBaseDirectory>
+    <includeBaseDirectory>false</includeBaseDirectory>
 
     <fileSets>
         <fileSet>
@@ -17,41 +18,41 @@
             <fileMode>0755</fileMode>
         </fileSet>
         <fileSet>
-            <directory>conf</directory>
-            <outputDirectory>conf</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>conf</directory>
-            <outputDirectory>conf</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>scripts</directory>
+            <directory>src/main/scripts</directory>
             <includes>
                 <include>*.sh</include>
-                <include>*.sql</include>
             </includes>
             <outputDirectory>scripts</outputDirectory>
         </fileSet>
-
-        <!--<fileSet>-->
-        <!--    <directory>src/main/bin</directory>-->
-        <!--    <includes>-->
-        <!--        <include>*.sh</include>-->
-        <!--    </includes>-->
-        <!--    <outputDirectory>bin</outputDirectory>-->
-        <!--    <fileMode>0755</fileMode>-->
-        <!--</fileSet>-->
+        <fileSet>
+            <directory>src/main/sql</directory>
+            <includes>
+                <include>*.sql</include>
+            </includes>
+            <outputDirectory>sql</outputDirectory>
+        </fileSet>
         <!--<fileSet>-->
         <!--    <directory>src/main/conf</directory>-->
         <!--    <outputDirectory>conf</outputDirectory>-->
         <!--</fileSet>-->
         <!--<fileSet>-->
-        <!--    <directory>src/main/sql</directory>-->
+        <!--    <directory>target/classes/conf</directory>-->
         <!--    <includes>-->
-        <!--        <include>*.sql</include>-->
+        <!--        <include>*.properties</include>-->
+        <!--        <include>*.xml</include>-->
+        <!--        <include>*.txt</include>-->
         <!--    </includes>-->
-        <!--    <outputDirectory>sql</outputDirectory>-->
+        <!--    <outputDirectory>conf</outputDirectory>-->
         <!--</fileSet>-->
+        <fileSet>
+            <directory>target/classes/conf</directory>
+            <includes>
+                <include>*.properties</include>
+                <include>*.xml</include>
+                <include>*.txt</include>
+            </includes>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
         <!--<fileSet>-->
         <!--    <directory>target/classes/</directory>-->
         <!--    <includes>-->
@@ -59,7 +60,7 @@
         <!--        <include>*.xml</include>-->
         <!--        <include>*.txt</include>-->
         <!--    </includes>-->
-        <!--    <outputDirectory>conf</outputDirectory>-->
+        <!--    <outputDirectory>。</outputDirectory>-->
         <!--</fileSet>-->
     </fileSets>
 
