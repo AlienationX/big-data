@@ -1,4 +1,4 @@
 package com.ego.mr.sql;
 
-public class LeftJoin {
+public class MapJoin {
 }

@@ -8,11 +8,11 @@
   </property>
   <property>
     <name>dfs.namenode.servicerpc-address</name>
-    <value>hadoop-dev01:8022</value>
+    <value>hadoop-prod00:8022</value>
   </property>
   <property>
     <name>dfs.https.address</name>
-    <value>hadoop-dev01:50470</value>
+    <value>hadoop-prod00:50470</value>
   </property>
   <property>
     <name>dfs.https.port</name>
@@ -20,11 +20,11 @@
   </property>
   <property>
     <name>dfs.namenode.http-address</name>
-    <value>hadoop-dev01:50070</value>
+    <value>hadoop-prod00:50070</value>
   </property>
   <property>
     <name>dfs.replication</name>
-    <value>3</value>
+    <value>2</value>
   </property>
   <property>
     <name>dfs.blocksize</name>
@@ -40,7 +40,7 @@
   </property>
   <property>
     <name>dfs.namenode.acls.enabled</name>
-    <value>false</value>
+    <value>true</value>
   </property>
   <property>
     <name>dfs.client.use.legacy.blockreader</name>

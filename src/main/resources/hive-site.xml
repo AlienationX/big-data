@@ -4,7 +4,7 @@
 <configuration>
   <property>
     <name>hive.metastore.uris</name>
-    <value>thrift://hadoop-dev01:9083</value>
+    <value>thrift://hadoop-prod00:9083</value>
   </property>
   <property>
     <name>hive.metastore.client.socket.timeout</name>
@@ -140,11 +140,11 @@
   </property>
   <property>
     <name>spark.executor.memory</name>
-    <value>5708709888</value>
+    <value>6442450944</value>
   </property>
   <property>
     <name>spark.driver.memory</name>
-    <value>3865470566</value>
+    <value>536870912</value>
   </property>
   <property>
     <name>spark.executor.cores</name>
@@ -152,11 +152,11 @@
   </property>
   <property>
     <name>spark.yarn.driver.memoryOverhead</name>
-    <value>409</value>
+    <value>128</value>
   </property>
   <property>
     <name>spark.yarn.executor.memoryOverhead</name>
-    <value>960</value>
+    <value>1024</value>
   </property>
   <property>
     <name>spark.dynamicAllocation.enabled</name>
@@ -184,7 +184,7 @@
   </property>
   <property>
     <name>hive.zookeeper.quorum</name>
-    <value>hadoop-dev01,hadoop-dev03,hadoop-dev02</value>
+    <value>hadoop-prod02,hadoop-prod00,hadoop-prod03</value>
   </property>
   <property>
     <name>hive.zookeeper.client.port</name>
@@ -196,7 +196,7 @@
   </property>
   <property>
     <name>hbase.zookeeper.quorum</name>
-    <value>hadoop-dev01,hadoop-dev03,hadoop-dev02</value>
+    <value>hadoop-prod02,hadoop-prod00,hadoop-prod03</value>
   </property>
   <property>
     <name>hbase.zookeeper.property.clientPort</name>
@@ -208,7 +208,7 @@
   </property>
   <property>
     <name>hive.server2.enable.doAs</name>
-    <value>true</value>
+    <value>false</value>
   </property>
   <property>
     <name>hive.server2.use.SSL</name>
@@ -220,6 +220,10 @@
   </property>
   <property>
     <name>hive.mapred.mode</name>
-    <value>strict</value>
+    <value>nonstrict</value>
+  </property>
+  <property>
+    <name>hive.exec.parallel</name>
+    <value>true</value>
   </property>
 </configuration>

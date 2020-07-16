@@ -50,7 +50,7 @@ public class HiveJDBC {
             logger.info("-------------------------------------");
             String sqlStr = "select * from medical.dim_date where year=?";
             PreparedStatement pstmt = conn.prepareStatement(sqlStr);
-            pstmt.setInt(1, 2019);
+            // pstmt.setInt(1, 2019);
             ResultSet resultSet = pstmt.executeQuery();
 
             // 动态解析ResultSet

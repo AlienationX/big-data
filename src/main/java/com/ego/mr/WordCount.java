@@ -78,13 +78,13 @@ public class WordCount {
 
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
         if (otherArgs.length != 2) {
-            System.err.println("Usage: wordcount <in> <out>");
+            System.err.println("Usage: word count <in> <out>");
             System.exit(2);
         }
 
         // 删除output路径
         FileSystem fs = FileSystem.get(conf);
-        Path path = new Path("tmp/output_wordcount");
+        Path path = new Path(otherArgs[1]);
         // Path path = new Path(otherArgs[1]);
         if (fs.exists(path)) {
             fs.delete(path, true);
@@ -100,7 +100,7 @@ public class WordCount {
         // job.setJar("target/bigdata-1.0-SNAPSHOT.jar");
         // 打包已经编译成class文件了，所以上传集群直接指定类运行即可
         // job.setJarByClass(WordCount.class);
-        if (InetAddress.getLocalHost().getHostName().equals("Dell")) {
+        if (!InetAddress.getLocalHost().getHostName().contains("hadoop")) {
             job.setJar("target/bigdata-1.0-SNAPSHOT.jar");
         } else {
             job.setJarByClass(WordCount.class);

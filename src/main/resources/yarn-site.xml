@@ -12,27 +12,27 @@
   </property>
   <property>
     <name>yarn.resourcemanager.address</name>
-    <value>hadoop-dev01:8032</value>
+    <value>hadoop-prod00:8032</value>
   </property>
   <property>
     <name>yarn.resourcemanager.admin.address</name>
-    <value>hadoop-dev01:8033</value>
+    <value>hadoop-prod00:8033</value>
   </property>
   <property>
     <name>yarn.resourcemanager.scheduler.address</name>
-    <value>hadoop-dev01:8030</value>
+    <value>hadoop-prod00:8030</value>
   </property>
   <property>
     <name>yarn.resourcemanager.resource-tracker.address</name>
-    <value>hadoop-dev01:8031</value>
+    <value>hadoop-prod00:8031</value>
   </property>
   <property>
     <name>yarn.resourcemanager.webapp.address</name>
-    <value>hadoop-dev01:8088</value>
+    <value>hadoop-prod00:8088</value>
   </property>
   <property>
     <name>yarn.resourcemanager.webapp.https.address</name>
-    <value>hadoop-dev01:8090</value>
+    <value>hadoop-prod00:8090</value>
   </property>
   <property>
     <name>yarn.resourcemanager.client.thread-count</name>
@@ -48,7 +48,7 @@
   </property>
   <property>
     <name>yarn.scheduler.minimum-allocation-mb</name>
-    <value>1024</value>
+    <value>2048</value>
   </property>
   <property>
     <name>yarn.scheduler.increment-allocation-mb</name>

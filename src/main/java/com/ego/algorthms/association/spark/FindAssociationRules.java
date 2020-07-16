@@ -46,7 +46,7 @@ public class FindAssociationRules {
     public static JavaRDD<Row> createLk(SparkSession spark, JavaRDD<Row> transactions, long rowNum, double minSupport, int k) {
         // 内置的累加器有三种，LongAccumulator、DoubleAccumulator、CollectionAccumulator
         // LongAccumulator: 数值型累加
-        LongAccumulator rowID = spark.sparkContext().longAccumulator("rowID");
+        LongAccumulator combinationNum = spark.sparkContext().longAccumulator("combinationNum");
 
         // map
         JavaPairRDD<List<String>, Integer> combinationGroupOne = transactions.flatMapToPair(new PairFlatMapFunction<Row, List<String>, Integer>() {
@@ -60,15 +60,17 @@ public class FindAssociationRules {
                 for (List<String> combination : combinations) {
                     if (combination.size() > 0) {
                         result.add(new Tuple2<>(combination, 1));
+
+                        // 累加器计数，只有action操作才会触发累加器的值
+                        combinationNum.add(1);
                     }
                 }
 
-                // 累加器计数
-                rowID.add(1);
-                if (rowID.value() % 10000 == 0 || rowID.value() == rowNum) {
-                    float rateOfProgress = (float) rowID.value() / rowNum * 100;
-                    System.out.println(String.format("STAGE-%s: Rate Of Progress %d(%.2f%%)", k, rowID.value(), rateOfProgress));
-                }
+
+                // if (combinationNum.value() % 10000 == 0 || combinationNum.value() == rowNum) {
+                //     float rateOfProgress = (float) combinationNum.value() / rowNum * 100;
+                //     System.out.println(String.format("STAGE-%s: Rate Of Progress %d(%.2f%%)", k, combinationNum.value(), rateOfProgress));
+                // }
                 return result.iterator();
             }
         });
