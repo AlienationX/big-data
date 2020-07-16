@@ -1,4 +1,4 @@
-package com.ego.mr.datasync;
+package com.ego.mapreduce.datasync;
 
 public class DBToHive {
 

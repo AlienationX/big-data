@@ -1,4 +1,4 @@
-package com.ego.mr.datasync;
+package com.ego.mapreduce.datasync;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;

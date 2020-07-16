@@ -1,4 +1,4 @@
-package com.ego.mr.sql;
+package com.ego.mapreduce.sql;
 
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.NullWritable;
