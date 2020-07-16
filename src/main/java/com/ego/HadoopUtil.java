@@ -24,7 +24,7 @@ public class HadoopUtil {
             String ip = InetAddress.getLocalHost().getHostAddress();
             // System.out.println(hostname);
             // System.out.println(ip);
-            return !hostname.contains("hadoop-dev");
+            return !hostname.contains("hadoop");
 
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -82,6 +82,7 @@ public class HadoopUtil {
         }
     }
 
+    // mapreduce
     public static Configuration getConf() {
         Configuration conf = new Configuration();
         Map<String, String> mapConf = getConfMap();
@@ -91,6 +92,7 @@ public class HadoopUtil {
         return conf;
     }
 
+    // spark
     public static SparkSession createSparkSession(String appName) {
         SparkSession spark;
         if (isDevelopment()) {

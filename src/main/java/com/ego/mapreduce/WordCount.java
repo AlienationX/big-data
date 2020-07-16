@@ -87,7 +87,6 @@ public class WordCount {
         // 删除output路径
         FileSystem fs = FileSystem.get(conf);
         Path path = new Path(otherArgs[1]);
-        // Path path = new Path(otherArgs[1]);
         if (fs.exists(path)) {
             fs.delete(path, true);
             System.out.println("output path is deleted");
@@ -102,11 +101,7 @@ public class WordCount {
         // job.setJar("target/bigdata-1.0-SNAPSHOT.jar");
         // 打包已经编译成class文件了，所以上传集群直接指定类运行即可
         // job.setJarByClass(WordCount.class);
-<<<<<<< HEAD:src/main/java/com/ego/mr/WordCount.java
-        if (!InetAddress.getLocalHost().getHostName().contains("hadoop")) {
-=======
         if (HadoopUtil.isDevelopment()) {
->>>>>>> 75d2fe3b18ad2d72c250ce30e81a69519bc7e32e:src/main/java/com/ego/mapreduce/WordCount.java
             job.setJar("target/bigdata-1.0-SNAPSHOT.jar");
         } else {
             job.setJarByClass(WordCount.class);
