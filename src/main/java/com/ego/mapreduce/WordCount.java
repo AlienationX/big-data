@@ -25,7 +25,7 @@ import java.util.StringTokenizer;
 
 
 public class WordCount {
-    private static Logger logger = Logger.getLogger(WordCount.class);
+    private static Logger LOG = Logger.getLogger(WordCount.class);
 
     public static class WordCountMapper extends Mapper<Object, Text, Text, IntWritable> {
         private final static IntWritable one = new IntWritable(1);
@@ -37,7 +37,7 @@ public class WordCount {
             while (itr.hasMoreTokens()) {
                 word.set(itr.nextToken());
                 context.write(word, one);
-                logger.info("{\"" + word + "\": " + one + "}");
+                LOG.info("{\"" + word + "\": " + one + "}");
             }
             // String[] words = value.toString().replaceAll(" +", " ").split(" ");
             // for (String word : words) {
@@ -64,7 +64,6 @@ public class WordCount {
     }
 
     public static void main(String[] args) throws Exception {
-
         // 设置环境变量
         HadoopUtil.setEnvironment();
 

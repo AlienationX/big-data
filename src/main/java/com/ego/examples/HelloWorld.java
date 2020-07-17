@@ -3,6 +3,8 @@ package com.ego.examples;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -63,6 +65,15 @@ public class HelloWorld {
         System.out.println(z);
         System.out.println(String.format("%.2f", (float) x / y));
 
+        // set
+        Set<String> set = new HashSet<>();
+        System.out.println(set.add("abc")); // true
+        System.out.println(set.add("xyz")); // true
+        System.out.println(set.add("xyz")); // false，添加失败，因为元素已存在
+        System.out.println(set.contains("xyz")); // true，元素存在
+        System.out.println(set.contains("XYZ")); // false，元素不存在
+        System.out.println(set.remove("hello")); // false，删除失败，因为元素不存在
+        System.out.println(set.size()); // 2，一共两个元素
 
         calculate();
     }

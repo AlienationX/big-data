@@ -37,12 +37,12 @@ public class HadoopUtil {
             System.setProperty("HADOOP_USER_NAME", "work");
             // 不添加yarn-site.xml等文件，使用本地模式运行时需要设置hadoop.home.dir路径
             // Could not locate executablenull\bin\winutils.exe in the Hadoop binaries。Windows下的特殊配置
-            System.setProperty("hadoop.home.dir", "E:\\Application\\hadoop-2.6.0");
+            // System.setProperty("hadoop.home.dir", "E:\\Application\\hadoop-2.6.0");
+            System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-common-2.6.0-bin");
         }
     }
 
     private static Map<String, String> getConfMap() {
-
         // 设置环境变量
         setEnvironment();
 
@@ -74,8 +74,8 @@ public class HadoopUtil {
         try {
             String tmpJarsPathKey = "tmp.jars.path";
             if (mapConf.containsKey(tmpJarsPathKey)) {
-                job.addFileToClassPath(new Path(mapConf.get(tmpJarsPathKey)));
-                System.out.println("Add " + mapConf.get(tmpJarsPathKey) + "to Class Path");
+                job.addArchiveToClassPath(new Path(mapConf.get(tmpJarsPathKey)));
+                System.out.println("Add hdfs:" + mapConf.get(tmpJarsPathKey) + " to Class Path");
             }
         } catch (Exception e) {
             e.printStackTrace();
