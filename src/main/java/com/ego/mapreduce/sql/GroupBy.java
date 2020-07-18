@@ -69,30 +69,32 @@ public class GroupBy {
             // record.set(1, value.get("amount", fromSchema));
 
             // context.write(new Text(name), record);
-            context.write(new Text(name),new IntWritable(1));
+            context.write(new Text(name), new IntWritable(1));
             // LOG.info(record.toString());
         }
 
     }
 
-    public static class GroupReduce extends Reducer<Text, HCatRecord, WritableComparable, HCatRecord> {
+    public static class GroupReduce extends Reducer<Text, IntWritable, WritableComparable, HCatRecord> {
         private HCatSchema toSchema;
 
         @Override
         public void setup(Context context) throws IOException {
-            toSchema = HCatInputFormat.getTableSchema(context.getConfiguration());
+            toSchema = HCatOutputFormat.getTableSchema(context.getConfiguration());
         }
 
         @Override
-        public void reduce(Text key, Iterable<HCatRecord> values, Context context) throws IOException, InterruptedException {
+        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
             int cnt = 0;
             Set<String> items = new HashSet<>();
             double sumAmount = 0;
             double maxAmount = 0;
 
-            for (HCatRecord value : values) {
-                String item = value.get(0).toString();
-                double amount = (double) value.get(1);
+            for (IntWritable value : values) {
+                String item = key.toString();
+                double amount = (double) value.get();
+                // String item = value.get(0).toString();
+                // double amount = (double) value.get(1);
 
                 cnt++;
                 items.add(item);
@@ -129,8 +131,6 @@ public class GroupBy {
 
         Job job = Job.getInstance(conf, "UseHCatGroupBy");
         job.setNumReduceTasks(1);
-        HadoopUtil.addTmpJars(job);
-        System.out.println(conf.get("yarn.application.classpath"));
 
         if (HadoopUtil.isDevelopment()) {
             job.setJar(HadoopUtil.LOCAL_JAR_NAME);

@@ -1,4 +1,4 @@
-package com.ego.mr.sql;
+package com.ego.mapreduce.sql;
 
 public class ReduceJoin {
 }

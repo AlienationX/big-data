@@ -37,8 +37,8 @@ public class HadoopUtil {
             System.setProperty("HADOOP_USER_NAME", "work");
             // 不添加yarn-site.xml等文件，使用本地模式运行时需要设置hadoop.home.dir路径
             // Could not locate executablenull\bin\winutils.exe in the Hadoop binaries。Windows下的特殊配置
-            // System.setProperty("hadoop.home.dir", "E:\\Application\\hadoop-2.6.0");
-            System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-common-2.6.0-bin");
+            System.setProperty("hadoop.home.dir", "E:\\Application\\hadoop-2.6.0");
+            // System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-common-2.6.0-bin");
         }
     }
 
@@ -88,6 +88,21 @@ public class HadoopUtil {
         Map<String, String> mapConf = getConfMap();
         for (String k : mapConf.keySet()) {
             conf.set(k, mapConf.get(k));
+        }
+        if (isDevelopment()) {
+            // yarn.application.classpath default value:
+            // $HADOOP_CLIENT_CONF_DIR,$HADOOP_CONF_DIR,$HADOOP_COMMON_HOME/*,$HADOOP_COMMON_HOME/lib/*,$HADOOP_HDFS_HOME/*,$HADOOP_HDFS_HOME/lib/*,$HADOOP_YARN_HOME/*,$HADOOP_YARN_HOME/lib/*
+            conf.set("yarn.application.classpath", "$HADOOP_CLIENT_CONF_DIR"
+                    + ",$HADOOP_CONF_DIR"
+                    + ",$HADOOP_COMMON_HOME/*"
+                    + ",$HADOOP_COMMON_HOME/lib/*"
+                    + ",$HADOOP_HDFS_HOME/*"
+                    + ",$HADOOP_HDFS_HOME/lib/*"
+                    + ",$HADOOP_YARN_HOME/*"
+                    + ",$HADOOP_YARN_HOME/lib/*"
+                    + ",/opt/cloudera/parcels/CDH/lib/hive/lib/*"
+                    + ",/opt/cloudera/parcels/CDH/lib/hive-hcatalog/share/hcatalog/*");
+            System.out.println("yarn.application.classpath=" + conf.get("yarn.application.classpath"));
         }
         return conf;
     }
