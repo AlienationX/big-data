@@ -12,7 +12,7 @@
         <fileSet>
             <directory>src/main/bin</directory>
             <includes>
-                <include>*.sh</include>
+                <include>*</include>
             </includes>
             <outputDirectory>bin</outputDirectory>
             <fileMode>0755</fileMode>
@@ -31,21 +31,9 @@
             </includes>
             <outputDirectory>sql</outputDirectory>
         </fileSet>
-        <!--<fileSet>-->
-        <!--    <directory>src/main/conf</directory>-->
-        <!--    <outputDirectory>conf</outputDirectory>-->
-        <!--</fileSet>-->
-        <!--<fileSet>-->
-        <!--    <directory>target/classes/conf</directory>-->
-        <!--    <includes>-->
-        <!--        <include>*.properties</include>-->
-        <!--        <include>*.xml</include>-->
-        <!--        <include>*.txt</include>-->
-        <!--    </includes>-->
-        <!--    <outputDirectory>conf</outputDirectory>-->
-        <!--</fileSet>-->
         <fileSet>
-            <directory>target/classes/conf</directory>
+            <!--<directory>target/classes/conf</directory>-->
+            <directory>src/main/resources/conf</directory>
             <includes>
                 <include>*.properties</include>
                 <include>*.xml</include>
@@ -53,29 +41,22 @@
             </includes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>
-        <!--<fileSet>-->
-        <!--    <directory>target/classes/</directory>-->
-        <!--    <includes>-->
-        <!--        <include>*.properties</include>-->
-        <!--        <include>*.xml</include>-->
-        <!--        <include>*.txt</include>-->
-        <!--    </includes>-->
-        <!--    <outputDirectory>。</outputDirectory>-->
-        <!--</fileSet>-->
     </fileSets>
-
-    <files>
-        <file>
-            <source>target/${project.artifactId}-${project.version}.jar</source>
-            <outputDirectory>.</outputDirectory>
-        </file>
-    </files>
 
     <dependencySets>
         <dependencySet>
             <unpack>false</unpack>
             <scope>runtime</scope>
             <outputDirectory>lib</outputDirectory>
+            <excludes>
+                <exclude>${project.groupId}:${project.artifactId}</exclude>
+            </excludes>
+        </dependencySet>
+        <dependencySet>
+            <unpack>true</unpack>
+            <includes>
+                <include>${project.groupId}:${project.artifactId}</include>
+            </includes>
         </dependencySet>
     </dependencySets>
 </assembly>
