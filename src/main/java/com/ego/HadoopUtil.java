@@ -1,6 +1,7 @@
 package com.ego;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.spark.sql.SparkSession;
@@ -17,6 +18,7 @@ import java.util.Properties;
 public class HadoopUtil {
 
     public final static String LOCAL_JAR_NAME = "target/bigdata-1.0-SNAPSHOT.jar";
+    public final static String WAREHOUSE_DIR = "/user/hive/warehouse";
 
     public static boolean isDevelopment() {
         try {
@@ -37,8 +39,8 @@ public class HadoopUtil {
             System.setProperty("HADOOP_USER_NAME", "work");
             // 不添加yarn-site.xml等文件，使用本地模式运行时需要设置hadoop.home.dir路径
             // Could not locate executablenull\bin\winutils.exe in the Hadoop binaries。Windows下的特殊配置
-            System.setProperty("hadoop.home.dir", "E:\\Application\\hadoop-2.6.0");
-            // System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-common-2.6.0-bin");
+            // System.setProperty("hadoop.home.dir", "E:\\Application\\hadoop-2.6.0");
+            System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-common-2.6.0-bin");
         }
     }
 
@@ -67,6 +69,15 @@ public class HadoopUtil {
             e.printStackTrace();
         }
         return confMap;
+    }
+
+    public static void deletePath(Configuration conf, Path path) throws IOException {
+        // 删除output路径
+        FileSystem fs = FileSystem.get(conf);
+        if (fs.exists(path)) {
+            fs.delete(path, true);
+            System.out.println("output path: hdfs://" + path + " is deleted");
+        }
     }
 
     public static void addTmpJars(Job job) {

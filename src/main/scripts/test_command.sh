@@ -9,7 +9,7 @@ hadoop jar bigdata-1.0-SNAPSHOT-assembly.jar com.ego.mapreduce.datasync.HiveToEs
 
 hadoop jar bigdata-1.0-SNAPSHOT-assembly.jar com.ego.mapreduce.WordCountES -libjars elasticsearch-hadoop-7.6.2.jar tmp/samples.txt medical/wordcount
 
-hadoop jar bigdata-1.0-SNAPSHOT-assembly.jar com.ego.mapreduce.sql.GroupBy a b
+hadoop jar bigdata-1.0-SNAPSHOT-assembly.jar com.ego.mapreduce.sql.Aggregation a b
 
 
 ########################################################################################################################
@@ -28,4 +28,4 @@ echo ${hcatalog_jars}
 all_jars=${hive_jars},${hcatalog_jars}
 
 echo ${all_jars}
-hadoop jar bigdata-1.0-SNAPSHOT-assembly.jar com.ego.mapreduce.sql.GroupBy -libjars ${all_jars} a b
+hadoop jar bigdata-1.0-SNAPSHOT-assembly.jar com.ego.mapreduce.sql.Aggregation -libjars ${all_jars} a b

@@ -2,7 +2,7 @@ package com.ego.mapreduce.sql;
 
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.Job;
@@ -47,10 +47,10 @@ import com.ego.HadoopUtil;
  * /opt/cloudera/parcels/CDH/lib/hive-hcatalog/share/hcatalog存在
  */
 
-public class GroupBy {
-    private static Logger LOG = Logger.getLogger(GroupBy.class);
+public class Aggregation {
+    private static Logger LOG = Logger.getLogger(Aggregation.class);
 
-    public static class GroupMap extends Mapper<WritableComparable, HCatRecord, Text, IntWritable> {
+    public static class AggregationMap extends Mapper<WritableComparable, HCatRecord, Text, HCatRecord> {
         private HCatSchema fromSchema;
 
         @Override
@@ -62,20 +62,18 @@ public class GroupBy {
         public void map(WritableComparable key, HCatRecord value, Context context) throws InterruptedException, IOException {
             String name = value.get("name", fromSchema).toString();
 
-            // record.setString("item", inputSchema, value.get("item", inputSchema).toString());
-            // record.setDouble("amount", inputSchema, (double) value.get("amount", inputSchema));
-            // HCatRecord record = new DefaultHCatRecord(2);
-            // record.set(0, value.get("item", fromSchema));
-            // record.set(1, value.get("amount", fromSchema));
+            HCatRecord record = new DefaultHCatRecord(2);
+            // record.setString("item", fromSchema, value.get("item", fromSchema).toString());
+            // record.setDouble("amount", fromSchema, (double) value.get("amount", fromSchema));
+            record.set(0, value.get("item", fromSchema));
+            record.set(1, value.get("amount", fromSchema));
 
-            // context.write(new Text(name), record);
-            context.write(new Text(name), new IntWritable(1));
-            // LOG.info(record.toString());
+            context.write(new Text(name), record);
+            LOG.info(record.toString());
         }
-
     }
 
-    public static class GroupReduce extends Reducer<Text, IntWritable, WritableComparable, HCatRecord> {
+    public static class AggregationReduce extends Reducer<Text, HCatRecord, WritableComparable, HCatRecord> {
         private HCatSchema toSchema;
 
         @Override
@@ -84,17 +82,15 @@ public class GroupBy {
         }
 
         @Override
-        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+        public void reduce(Text key, Iterable<HCatRecord> values, Context context) throws IOException, InterruptedException {
             int cnt = 0;
             Set<String> items = new HashSet<>();
             double sumAmount = 0;
             double maxAmount = 0;
 
-            for (IntWritable value : values) {
-                String item = key.toString();
-                double amount = (double) value.get();
-                // String item = value.get(0).toString();
-                // double amount = (double) value.get(1);
+            for (HCatRecord value : values) {
+                String item = value.get(0).toString();
+                double amount = (double) value.get(1);
 
                 cnt++;
                 items.add(item);
@@ -103,20 +99,20 @@ public class GroupBy {
                     maxAmount = amount;
                 }
             }
-            // HCatRecord record = new DefaultHCatRecord();
-            // record.set("name", schema,);
+
             HCatRecord record = new DefaultHCatRecord(5);
             record.set("name", toSchema, key.toString());
-            record.set("item_num", toSchema, items.size());
+            record.set("item_num", toSchema, (long) items.size());
             record.set("sum_amount", toSchema, sumAmount);
             record.set("avg_amount", toSchema, sumAmount / cnt);
             record.set("max_amount", toSchema, maxAmount);
             // record.set(0, key.toString());
-            // record.set(1, itemNum);
+            // record.set(1, (long) items.size());
             // record.set(2, sumAmount);
             // record.set(3, sumAmount/cnt);
             // record.set(4, minAmount);
             context.write(null, record);
+            LOG.info(record.toString());
         }
     }
 
@@ -125,36 +121,46 @@ public class GroupBy {
 
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
         if (otherArgs.length != 2) {
-            System.err.println("Usage: Group By <fromTable> <toTable>");
+            System.err.println("Usage: Group By <fromTable> <toTable> <isTruncate>");
             System.exit(2);
         }
+        // String fromTable = otherArgs[0];
+        // String toTable = otherArgs[1];
+        String fromTable = "tmp.mr_group";
+        String toTable = "tmp.mr_group_result";
+        String fromDbName = fromTable.split("\\.")[0];
+        String fromTbName = fromTable.split("\\.")[1];
+        String toDbName = toTable.split("\\.")[0];
+        String toTbName = toTable.split("\\.")[1];
 
-        Job job = Job.getInstance(conf, "UseHCatGroupBy");
+
+        Job job = Job.getInstance(conf, "UseHCatAggregation");
         job.setNumReduceTasks(1);
 
         if (HadoopUtil.isDevelopment()) {
             job.setJar(HadoopUtil.LOCAL_JAR_NAME);
         } else {
-            job.setJarByClass(GroupBy.class);
+            job.setJarByClass(Aggregation.class);
         }
 
-        job.setMapperClass(GroupBy.GroupMap.class);
-        job.setReducerClass(GroupBy.GroupReduce.class);
+        job.setMapperClass(AggregationMap.class);
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(DefaultHCatRecord.class);  // 必须DefaultHCatRecord，否则报错Error: java.io.IOException: Type mismatch in value from map: expected org.apache.hive.hcatalog.data.HCatRecord, received org.apache.hive.hcatalog.data.DefaultHCatRecord
 
-        // job.setMapOutputKeyClass(Text.class);
-        // job.setMapOutputValueClass(DefaultHCatRecord.class);
-
+        job.setReducerClass(AggregationReduce.class);
         job.setOutputKeyClass(WritableComparable.class);
-        job.setOutputValueClass(DefaultHCatRecord.class);
-        // job.setOutputValueClass(HCatRecord.class);
+        job.setOutputValueClass(HCatRecord.class);
 
-        HCatInputFormat.setInput(job, "tmp", "mr_group");
+        // HCatInputFormat.setInput(job, "tmp", "mr_group");
+        HCatInputFormat.setInput(job, fromDbName, fromTbName);
         job.setInputFormatClass(HCatInputFormat.class);
 
-        HCatOutputFormat.setOutput(job, OutputJobInfo.create("tmp", "mr_group_result", null));
+        // HCatOutputFormat.setOutput(job, OutputJobInfo.create("tmp", "mr_group_result", null));
+        HCatOutputFormat.setOutput(job, OutputJobInfo.create(toDbName, toTbName, null));
         job.setOutputFormatClass(HCatOutputFormat.class);
+        HCatSchema s = HCatOutputFormat.getTableSchema(job.getConfiguration());
+        HCatOutputFormat.setSchema(job, s);
 
         System.exit(job.waitForCompletion(true) ? 0 : 1);
-
     }
 }
