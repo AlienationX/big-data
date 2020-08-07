@@ -2,7 +2,6 @@ package com.ego.mapreduce.sql;
 
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.Job;
@@ -24,23 +23,15 @@ import java.util.Set;
 import com.ego.HadoopUtil;
 
 /**
- * create table tmp.mr_group stored as parquet as
- * select 'roger' as name,'2020-01-01' as dt,'milk' as item,5 as amount union all
- * select 'roger' as name,'2020-01-02' as dt,'milk' as item,5 as amount union all
- * select 'roger' as name,'2020-01-02' as dt,'bread' as item,10 as amount union all
- * select 'roger' as name,'2020-01-02' as dt,'orange' as item,3 as amount union all
- * select 'mike' as name,'2020-01-01' as dt,'bread' as item,12.5 as amount union all
- * select 'mike' as name,'2020-01-02' as dt,'orange' as item,6 as amount union all
- * select 'mike' as name,'2020-01-03' as dt,'orange' as item,6 as amount;
- *
- * create table tmp.mr_group_result stored as parquet as
- * select name,
- *        count(distinct item) as item_num,
+ * create table tmp.mr_detail_aggregation stored as parquet as
+ * select date_format(charge_time,'yyyy-MM-dd') as dt,
+ *        count(distinct item_name) as item_num,
  *        sum(amount) as sum_amount,
  *        avg(amount) as avg_amount,
- *        max(amount) as max_amount
- * from tmp.mr_group
- * group by name;
+ *        max(amount) as max_amount,
+ *        min(amount) as min_amount
+ * from tmp.mr_detail
+ * group by date_format(charge_time,'yyyy-MM-dd');
  *
  * yarn没有hive-hcatalog-core-1.1.0-cdh5.16.2.jar，所以需要job.addFileToClassPath单独添加
  * /opt/cloudera/parcels/CDH/lib/hive/lib下没有
@@ -52,6 +43,7 @@ public class Aggregation {
 
     public static class AggregationMap extends Mapper<WritableComparable, HCatRecord, Text, HCatRecord> {
         private HCatSchema fromSchema;
+        private HCatRecord record = new DefaultHCatRecord(2);
 
         @Override
         public void setup(Context context) throws IOException {
@@ -60,15 +52,14 @@ public class Aggregation {
 
         @Override
         public void map(WritableComparable key, HCatRecord value, Context context) throws InterruptedException, IOException {
-            String name = value.get("name", fromSchema).toString();
+            String dt = value.getTimestamp("charge_time", fromSchema).toString().substring(0, 10);
 
-            HCatRecord record = new DefaultHCatRecord(2);
             // record.setString("item", fromSchema, value.get("item", fromSchema).toString());
             // record.setDouble("amount", fromSchema, (double) value.get("amount", fromSchema));
-            record.set(0, value.get("item", fromSchema));
+            record.set(0, value.get("item_name", fromSchema));
             record.set(1, value.get("amount", fromSchema));
 
-            context.write(new Text(name), record);
+            context.write(new Text(dt), record);
             LOG.info(record.toString());
         }
     }
@@ -85,32 +76,55 @@ public class Aggregation {
         public void reduce(Text key, Iterable<HCatRecord> values, Context context) throws IOException, InterruptedException {
             int cnt = 0;
             Set<String> items = new HashSet<>();
-            double sumAmount = 0;
-            double maxAmount = 0;
+            Double sumAmount = null;
+            Double maxAmount = null;
+            Double minAmount = null;
 
             for (HCatRecord value : values) {
                 String item = value.get(0).toString();
-                double amount = (double) value.get(1);
-
-                cnt++;
                 items.add(item);
-                sumAmount += amount;
-                if (amount > maxAmount) {
-                    maxAmount = amount;
+                cnt += 1;
+
+                Object o = value.get(1);
+                if (o != null) {
+                    Double amount = Double.parseDouble(o.toString());
+                    if (sumAmount == null) {
+                        sumAmount = amount;
+                    } else {
+                        sumAmount += amount;
+                    }
+
+                    if (maxAmount == null) {
+                        maxAmount = amount;
+                    } else {
+                        if (amount > maxAmount) {
+                            maxAmount = amount;
+                        }
+                    }
+
+                    if (minAmount == null) {
+                        minAmount = amount;
+                    } else {
+                        if (amount < minAmount) {
+                            minAmount = amount;
+                        }
+                    }
                 }
             }
 
-            HCatRecord record = new DefaultHCatRecord(5);
-            record.set("name", toSchema, key.toString());
+            HCatRecord record = new DefaultHCatRecord(6);
+            record.set("dt", toSchema, key.toString());
             record.set("item_num", toSchema, (long) items.size());
             record.set("sum_amount", toSchema, sumAmount);
-            record.set("avg_amount", toSchema, sumAmount / cnt);
+            record.set("avg_amount", toSchema, null == sumAmount ? null : sumAmount / cnt);
             record.set("max_amount", toSchema, maxAmount);
+            record.set("min_amount", toSchema, minAmount);
             // record.set(0, key.toString());
             // record.set(1, (long) items.size());
             // record.set(2, sumAmount);
             // record.set(3, sumAmount/cnt);
-            // record.set(4, minAmount);
+            // record.set(4, maxAmount);
+            // record.set(5, minAmount);
             context.write(null, record);
             LOG.info(record.toString());
         }
@@ -126,12 +140,14 @@ public class Aggregation {
         }
         // String fromTable = otherArgs[0];
         // String toTable = otherArgs[1];
-        String fromTable = "tmp.mr_group";
-        String toTable = "tmp.mr_group_result";
-        String fromDbName = fromTable.split("\\.")[0];
-        String fromTbName = fromTable.split("\\.")[1];
-        String toDbName = toTable.split("\\.")[0];
-        String toTbName = toTable.split("\\.")[1];
+        String fromTable = "tmp.mr_detail";
+        String toTable = "tmp.mr_detail_aggregation";
+
+        String p = "\\.";
+        String fromDbName = fromTable.split(p)[0];
+        String fromTbName = fromTable.split(p)[1];
+        String toDbName = toTable.split(p)[0];
+        String toTbName = toTable.split(p)[1];
 
 
         Job job = Job.getInstance(conf, "UseHCatAggregation");

@@ -332,32 +332,32 @@
         <!--    </plugin>-->
         <!--</plugins>-->
 
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <descriptors>
-                        <descriptor>assembly.xml</descriptor>
-                    </descriptors>
-                    <!--<archive>-->
-                    <!--    <manifest>-->
-                    <!--        <addClasspath>true</addClasspath>-->
-                    <!--    </manifest>-->
-                    <!--</archive>-->
-                    <!--<finalName>${project.artifactId}-${project.version}-with-dependency</finalName>-->
-                </configuration>
-            </plugin>
-        </plugins>
+        <!--<plugins>-->
+        <!--    <plugin>-->
+        <!--        <groupId>org.apache.maven.plugins</groupId>-->
+        <!--        <artifactId>maven-assembly-plugin</artifactId>-->
+        <!--        <executions>-->
+        <!--            <execution>-->
+        <!--                <id>make-assembly</id>-->
+        <!--                <phase>package</phase>-->
+        <!--                <goals>-->
+        <!--                    <goal>single</goal>-->
+        <!--                </goals>-->
+        <!--            </execution>-->
+        <!--        </executions>-->
+        <!--        <configuration>-->
+        <!--            <descriptors>-->
+        <!--                <descriptor>assembly.xml</descriptor>-->
+        <!--            </descriptors>-->
+        <!--            &lt;!&ndash;<archive>&ndash;&gt;-->
+        <!--            &lt;!&ndash;    <manifest>&ndash;&gt;-->
+        <!--            &lt;!&ndash;        <addClasspath>true</addClasspath>&ndash;&gt;-->
+        <!--            &lt;!&ndash;    </manifest>&ndash;&gt;-->
+        <!--            &lt;!&ndash;</archive>&ndash;&gt;-->
+        <!--            &lt;!&ndash;<finalName>${project.artifactId}-${project.version}-with-dependency</finalName>&ndash;&gt;-->
+        <!--        </configuration>-->
+        <!--    </plugin>-->
+        <!--</plugins>-->
 
     </build>
 </project>

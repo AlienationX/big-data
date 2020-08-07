@@ -22,43 +22,45 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.ego.HadoopUtil;
+
 /**
  * load mysql table import HDFS
- * <p>
+ *
  * CREATE TABLE `users` (
- * `id` int(11) NOT NULL AUTO_INCREMENT,
- * `name` varchar(30) DEFAULT NULL,
- * `age` int(11) DEFAULT NULL,
- * `balance` double(18,2) DEFAULT NULL COMMENT '余额',
- * `create_time` timestamp NULL DEFAULT NULL,
- * `upload_date` date DEFAULT NULL,
- * `dt` datetime DEFAULT NULL,
- * PRIMARY KEY (`id`)
+ *     `id` int(11) NOT NULL AUTO_INCREMENT,
+ *     `name` varchar(30) DEFAULT NULL,
+ *     `age` int(11) DEFAULT NULL,
+ *     `balance` double(18,2) DEFAULT NULL COMMENT '余额',
+ *     `create_time` timestamp NULL DEFAULT NULL,
+ *     `upload_date` date DEFAULT NULL,
+ *     `dt` datetime DEFAULT NULL,
+ *     PRIMARY KEY (`id`)
  * ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
- * <p>
+ *
  * INSERT INTO `users` VALUES (1, '张三', NULL, 88.20, '2019-10-01 21:36:19', NULL, NULL);
  * INSERT INTO `users` VALUES (2, 'xiaoming', 18, 66.00, '2019-11-02 21:36:48', '2019-11-04', '2019-11-02 21:40:29');
  * INSERT INTO `users` VALUES (3, 'mic', 24, 38.63, NULL, '2019-11-02', NULL);
  * INSERT INTO `users` VALUES (4, '北京 上海', NULL, 100.00, NULL, NULL, '2019-11-02 21:40:11');
  * INSERT INTO `users` VALUES (5, 'unknown', NULL, NULL, NULL, NULL, NULL);
  * INSERT INTO `users` VALUES (6, NULL, NULL, NULL, NULL, NULL, NULL);
- * <p>
+ *
  * drop table tmp.mysql_users;
  * create external table tmp.mysql_users (
- * id int,
- * name string,
- * age int,
- * balance double,
- * create_time string,
- * upload_date string,
- * dt string
+ *     id int,
+ *     name string,
+ *     age int,
+ *     balance double,
+ *     create_time string,
+ *     upload_date string,
+ *     dt string
  * )
  * row format delimited
  * fields terminated by '\t'
  * location '/user/work/tmp/mysql_users';
- * <p>
+ *
  * select * from tmp.mysql_users;
- * <p>
+ *
  * 推荐使用hive的默认分隔符"\001"作为字段分隔符
  */
 
@@ -68,22 +70,22 @@ public class DBToHDFS {
     public static class TableUsers implements Writable, DBWritable {
         /**
          * 全用字符串来处理，txt格式本来也没有字段类型定义，在hive中定义成相应的数据格式即可。
-         * <p>
+         *
          * ResultSet.getInt，ResultSet.getLong，ResultSet.getDouble等
          * 如果获取的数据库的值是null，默认会返回0。如果判断设置为null会报空指针的错误，处理起来非常麻烦！！！
-         * <p>
+         *
          * ResultSet.getString会把null值替换成"null"字符串，如果想替换成hive的空值字符，需要转换成"\N"
          * 相当于sqoop下面参数的功能
          * --null-string '\\N' \
          * --null-non-string '\\N' \
-         * <p>
+         *
          * --hive-drop-import-delims: Drop Hive record \0x01 and row delimiters (\n\r) from imported string fields
          * --hive-delims-replacement <arg> : Replace Hive record \0x01 and row delimiters (\n\r) from imported string fields with user-defined string
          * 使用方法，
          * 1、在原有sqoop语句中添加 --hive-delims-replacement " " 可以将如mysql中取到的\n, \r, and \01等特殊字符替换为自定义的字符，此处用了空格
          * 2、在原有sqoop语句中添加 --hive-drop-import-delims 可以将如mysql中取到的\n, \r, and \01等特殊字符丢弃
          * \0x01 = \u0001 = \001 ?
-         * <p>
+         *
          * 能否转成成动态类，每个表都写个Bean类太麻烦了
          */
 
@@ -171,12 +173,7 @@ public class DBToHDFS {
     }
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("HADOOP_USER_NAME", "work");
-        System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-common-2.6.0-bin");
-
-        Configuration conf = new Configuration();
-        // 如果要从windows系统中运行这个job提交客户端的程序，则需要加这个跨平台提交的参数
-        conf.set("mapreduce.app-submission.cross-platform", "true");
+        Configuration conf = HadoopUtil.getConf();
 
         DBConfiguration.configureDB(conf,
                 "com.mysql.jdbc.Driver",
@@ -195,7 +192,7 @@ public class DBToHDFS {
 
         Job job = Job.getInstance(conf);
         job.setJobName("Mysql To HDFS");
-        job.addFileToClassPath(new Path("hdfs:///user/work/jars/mysql-connector-java-5.1.48.jar"));
+        job.addArchiveToClassPath(new Path("hdfs:///user/work/jars/mysql-connector-java-5.1.48.jar"));
         job.setNumReduceTasks(0);  // reduceTasks为0，就不会执行reduce阶段
 
         if (InetAddress.getLocalHost().getHostName().equals("Dell")) {

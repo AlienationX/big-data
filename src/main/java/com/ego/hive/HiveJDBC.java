@@ -27,7 +27,7 @@ public class HiveJDBC {
 
     // Hive
     private static String JDBC_DRIVER = "org.apache.hive.jdbc.HiveDriver";
-    private static String URL = "jdbc:hive2://hadoop-dev01:10000/default";    // hive
+    private static String URL = "jdbc:hive2://hadoop-prod05:10000/default";    // hive
     // private static String URL = "jdbc:hive2://hadoop-dev03:21050/;auth=noSasl";  // 可以直接使用impala
     private static String USER = "work";
     private static String PWD = "";
@@ -52,7 +52,7 @@ public class HiveJDBC {
             logger.info("-------------------------------------");
             String sqlStr = "select * from medical.dim_date where year=?";
             PreparedStatement pstmt = conn.prepareStatement(sqlStr);
-            // pstmt.setInt(1, 2019);
+            pstmt.setInt(1, 2019);
             ResultSet resultSet = pstmt.executeQuery();
 
             // 动态解析ResultSet

@@ -16,15 +16,16 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import com.ego.mapreduce.common.CommonTableBean;
+import com.ego.HadoopUtil;
+import com.ego.mapreduce.common.TableBean;
 
 /**
  * from database import table to HDFS
- * <p>
+ *
  * todo
  * 需要通过jdbc动态获取所有字段名称
  * 控制map数量
- * <p>
+ *
  * param table_name  or query_sql
  * param tmp_path
  * param output_path
@@ -33,10 +34,10 @@ import com.ego.mapreduce.common.CommonTableBean;
 
 public class DBToHDFSHard {
 
-    public static class DBInputMapper extends Mapper<LongWritable, CommonTableBean, Text, NullWritable> {
+    public static class DBInputMapper extends Mapper<LongWritable, TableBean, Text, NullWritable> {
         Text outKey = new Text();
 
-        public void map(LongWritable key, CommonTableBean value, Context context) throws IOException, InterruptedException {
+        public void map(LongWritable key, TableBean value, Context context) throws IOException, InterruptedException {
             String formatValue = value.toString().replaceAll("\n", " ").replaceAll("\r", " ").replaceAll("\t", " ").replaceAll("\001", "");
             outKey.set(formatValue);
             context.write(outKey, NullWritable.get());
@@ -44,12 +45,7 @@ public class DBToHDFSHard {
     }
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("HADOOP_USER_NAME", "work");
-        System.setProperty("hadoop.home.dir", "E:\\Appilaction\\hadoop-common-2.6.0-bin");
-
-        Configuration conf = new Configuration();
-        // 如果要从windows系统中运行这个job提交客户端的程序，则需要加这个跨平台提交的参数
-        conf.set("mapreduce.app-submission.cross-platform", "true");
+        Configuration conf = HadoopUtil.getConf();
 
         DBConfiguration.configureDB(conf,
                 "com.mysql.jdbc.Driver",
@@ -85,7 +81,7 @@ public class DBToHDFSHard {
         String[] fields = {"id", "name", "age", "balance", "create_time", "upload_date", "dt"};
         // 可以采用query，需要指定查询语句inoutQuery和计数语句inoutCountQuery。
         // DBInputFormat.setInput(job, TableUsers.class, "select id,name,balance from users", "select count(*) from users");
-        DBInputFormat.setInput(job, CommonTableBean.class, "users", null, null, fields);
+        DBInputFormat.setInput(job, TableBean.class, "users", null, null, fields);
         FileOutputFormat.setOutputPath(job, new Path(outputStr));
 
         System.exit(job.waitForCompletion(true) ? 0 : 1);

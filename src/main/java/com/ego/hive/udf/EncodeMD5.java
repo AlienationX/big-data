@@ -26,8 +26,8 @@ public class EncodeMD5 extends UDF {
         System.out.println(dbMD5.evaluate(str));
 
         String[] list = "beijing shanghai guangzhou 深圳".split(" ");
-        for (int i = 0; i < list.length; i++) {
-            System.out.println(dbMD5.evaluate(list[i]));
+        for (String s : list) {
+            System.out.println(dbMD5.evaluate(s));
         }
     }
 }

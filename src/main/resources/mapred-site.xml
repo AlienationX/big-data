@@ -80,19 +80,19 @@
   </property>
   <property>
     <name>mapreduce.jobhistory.address</name>
-    <value>hadoop-prod00:10020</value>
+    <value>hadoop-prod05:10020</value>
   </property>
   <property>
     <name>mapreduce.jobhistory.webapp.address</name>
-    <value>hadoop-prod00:19888</value>
+    <value>hadoop-prod05:19888</value>
   </property>
   <property>
     <name>mapreduce.jobhistory.webapp.https.address</name>
-    <value>hadoop-prod00:19890</value>
+    <value>hadoop-prod05:19890</value>
   </property>
   <property>
     <name>mapreduce.jobhistory.admin.address</name>
-    <value>hadoop-prod00:10033</value>
+    <value>hadoop-prod05:10033</value>
   </property>
   <property>
     <name>mapreduce.framework.name</name>

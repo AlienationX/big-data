@@ -1,6 +1,10 @@
 package com.ego.examples;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -41,6 +45,17 @@ public class HelloWorld {
         System.out.println(ft.format(new Date()));
     }
 
+    private static void dtTest() {
+        System.out.println("-------------------------");
+        LocalDateTime dt = LocalDateTime.now();
+        System.out.println(dt.getClass());
+        System.out.println(dt);
+        System.out.println(Timestamp.valueOf(LocalDateTime.now()));  // 强力推荐
+        System.out.println(LocalDate.now());
+        System.out.println(LocalTime.now());
+        System.out.println("-------------------------");
+    }
+
     public static void main(String[] args) {
         System.out.println("Hello World!");
         String a = "a  b c";
@@ -76,5 +91,12 @@ public class HelloWorld {
         System.out.println(set.size()); // 2，一共两个元素
 
         calculate();
+
+        Timestamp ts = Timestamp.valueOf("2019-01-01 12:23:44");
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        System.out.println(now);
+        System.out.println(ts.toString().substring(0, 10));
+
+        dtTest();
     }
 }
