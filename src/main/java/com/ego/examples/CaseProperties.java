@@ -16,7 +16,8 @@ public class CaseProperties {
         sysProp.list(System.out);
 
         // read
-        InputStream in = new FileInputStream("conf/db.properties");
+        // InputStream in = new FileInputStream("conf/db.properties");  // 当前项目的路径
+        InputStream in = CaseProperties.class.getClassLoader().getResourceAsStream("conf/db.properties");  // resources下的路径，推荐
         Properties prop = new Properties();
         prop.load(in);
         System.out.println("-- custom properties --");
@@ -31,6 +32,8 @@ public class CaseProperties {
         cacheProp.setProperty("age", "18");
         System.out.println("-- cache properties --");
         cacheProp.list(System.out);
+        // cacheProp.store(new FileOutputStream("conf/cache.properties"), "cache");
+        // cacheProp.storeToXML(new FileOutputStream("conf/cache.xml"), "temp");
         cacheProp.store(new FileOutputStream("conf/cache.properties"), "cache");
         cacheProp.storeToXML(new FileOutputStream("conf/cache.xml"), "temp");
     }

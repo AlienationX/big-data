@@ -4,6 +4,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 
 import java.io.FileInputStream;
@@ -27,7 +28,6 @@ public class HadoopUtil {
             // System.out.println(hostname);
             // System.out.println(ip);
             return !hostname.contains("hadoop");
-
         } catch (UnknownHostException e) {
             e.printStackTrace();
             return false;
@@ -45,9 +45,6 @@ public class HadoopUtil {
     }
 
     private static Map<String, String> getConfMap() {
-        // 设置环境变量
-        setEnvironment();
-
         // 读取配置文件
         String file;
         if (isDevelopment()) {
@@ -95,6 +92,9 @@ public class HadoopUtil {
 
     // mapreduce
     public static Configuration getConf() {
+        // 设置环境变量
+        setEnvironment();
+
         Configuration conf = new Configuration();
         Map<String, String> mapConf = getConfMap();
         for (String k : mapConf.keySet()) {
@@ -118,13 +118,31 @@ public class HadoopUtil {
         return conf;
     }
 
-    // spark
+    // spark conf
+    public static SparkConf getSparkConf() {
+        // 设置环境变量
+        setEnvironment();
+
+        SparkConf sparkConf = new SparkConf();
+
+        Map<String, String> mapConf = getConfMap();
+        for (String k : mapConf.keySet()) {
+            sparkConf.set(k, mapConf.get(k));
+        }
+
+        return sparkConf;
+    }
+
+    // spark session
     public static SparkSession createSparkSession(String appName) {
+        // 设置环境变量
+        setEnvironment();
+
         SparkSession spark;
         if (isDevelopment()) {
             spark = SparkSession
                     .builder()
-                    .master("local")
+                    .master("local[*]")
                     .appName(appName)
                     .config("spark.some.config.option", "some-value")
                     .enableHiveSupport()

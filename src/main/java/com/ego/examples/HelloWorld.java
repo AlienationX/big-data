@@ -1,13 +1,20 @@
 package com.ego.examples;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -56,6 +63,28 @@ public class HelloWorld {
         System.out.println("-------------------------");
     }
 
+    private static void containsList() {
+        List<String> a = Arrays.asList("a", "b", "c"); // 这种方式使用removeAll会报错
+        List<String> b = Arrays.asList("b", "c");
+        System.out.println(a.containsAll(b));
+        System.out.println(b.containsAll(a));
+
+        List<String> c = new ArrayList<>(Arrays.asList("a", "c", "b"));
+        List<String> d = new ArrayList<>(Arrays.asList("b", "c", "d"));
+        c.removeAll(d);
+        System.out.println("交集: " + c);
+        c.addAll(d);
+        System.out.println("(去重)并集:" + c);
+        System.out.println(c.subList(0, 2));
+
+        List<String> l1 = new ArrayList<>();
+        List<String> l2 = new ArrayList<>();
+        System.out.println("l1=" + l1);
+        System.out.println("l2=" + l2);
+        System.out.println(l1.equals(l2));
+        System.out.println(l1.addAll(l2));
+    }
+
     public static void main(String[] args) {
         System.out.println("Hello World!");
         String a = "a  b c";
@@ -98,5 +127,15 @@ public class HelloWorld {
         System.out.println(ts.toString().substring(0, 10));
 
         dtTest();
+
+        System.out.println("110110190006221314".substring(6, 14));
+        // Integer aNum = Integer.parseInt("ab");
+        System.out.println(StringUtils.isNumeric("123"));
+        System.out.println(LocalDate.parse("20201231", DateTimeFormatter.ofPattern("yyyyMMdd")));
+
+
+        containsList();
+
+        System.out.println(DigestUtils.md5Hex("i love you"));
     }
 }

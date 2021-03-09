@@ -12,6 +12,48 @@ hadoop jar bigdata-1.0-SNAPSHOT-assembly.jar com.ego.mapreduce.WordCountES -libj
 hadoop jar bigdata-1.0-SNAPSHOT-assembly.jar com.ego.mapreduce.sql.Aggregation a b
 
 
+spark2-submit \
+--master yarn \
+--deploy-mode cluster \
+--name "Find Association Rules" \
+--driver-memory 1g \
+--executor-memory 10g \
+--queue root.flow \
+--class com.ego.algorthms.association.spark.FindAssociationRules \
+bigdata-1.0-SNAPSHOT.jar 0.1 0.5
+
+spark2-submit \
+--master yarn \
+--deploy-mode client \
+--name "Find Association Rules" \
+--driver-memory 2g \
+--executor-memory 6g \
+--queue root.workflow \
+--class com.ego.algorthms.association.spark.FindAssociationRules \
+bigdata-1.0-SNAPSHOT.jar 0.02857 1
+
+spark2-submit \
+--master yarn \
+--deploy-mode client \
+--name "Aprioir" \
+--driver-memory 2g \
+--executor-memory 6g \
+--queue root.workflow \
+--class com.ego.algorthms.association.spark.Apriori \
+bigdata-1.0-SNAPSHOT.jar tmp.transactions_zy clientids tmp.transactions_zy_set 0.02857 1
+
+time spark2-submit \
+--master yarn \
+--deploy-mode cluster \
+--name "Aprioir" \
+--driver-memory 2g \
+--executor-memory 4g \
+--num-executors 4 \
+--queue root.workflow \
+--class com.ego.algorthms.association.spark.Apriori \
+bigdata-1.0-SNAPSHOT.jar tmp.transactions_zy clientids tmp.transactions_zy_set 0.0042857 1
+
+
 ########################################################################################################################
 # execute hadoop jar with libjars
 HIVE_LIB="/opt/cloudera/parcels/CDH/lib/hive/lib"

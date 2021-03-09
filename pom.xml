@@ -59,6 +59,24 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/org.apache.hive/hive-exec -->
         <dependency>
@@ -80,14 +98,21 @@
             <artifactId>hbase-client</artifactId>
             <version>1.2.0-cdh5.16.2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase-server -->
+        <!--<dependency>-->
+        <!--    <groupId>org.apache.hbase</groupId>-->
+        <!--    <artifactId>hbase-server</artifactId>-->
+        <!--    <version>1.2.0-cdh5.16.2</version>-->
+        <!--</dependency>-->
+        <!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase-common -->
 
 
         <!-- https://mvnrepository.com/artifact/org.apache.solr/solr-solrj -->
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>4.10.3-cdh5.16.2</version>
-        </dependency>
+        <!--<dependency>-->
+        <!--    <groupId>org.apache.solr</groupId>-->
+        <!--    <artifactId>solr-solrj</artifactId>-->
+        <!--    <version>4.10.3-cdh5.16.2</version>-->
+        <!--</dependency>-->
 
 
         <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
@@ -238,6 +263,37 @@
             <version>3.1.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/ru.yandex.clickhouse/clickhouse-jdbc-->
+        <dependency>
+            <groupId>ru.yandex.clickhouse</groupId>
+            <artifactId>clickhouse-jdbc</artifactId>
+            <version>0.2.4</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jackson-core</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--&lt;!&ndash; https://mvnrepository.com/artifact/com.github.housepower/clickhouse-native-jdbc &ndash;&gt;-->
+        <!--<dependency>-->
+        <!--    <groupId>com.github.housepower</groupId>-->
+        <!--    <artifactId>clickhouse-native-jdbc</artifactId>-->
+        <!--    <version>2.3-stable</version>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash; https://mvnrepository.com/artifact/com.github.housepower/clickhouse-native-jdbc-shaded &ndash;&gt;-->
+        <!--<dependency>-->
+        <!--    <groupId>com.github.housepower</groupId>-->
+        <!--    <artifactId>clickhouse-native-jdbc-shaded</artifactId>-->
+        <!--    <version>2.3-stable</version>-->
+        <!--</dependency>-->
+        <!-- &lt;!&ndash;https://mvnrepository.com/artifact/com.github.housepower/clickhouse-integration-spark&ndash;&gt;-->
+        <!--<dependency>-->
+        <!--    <groupId>com.github.housepower</groupId>-->
+        <!--    <artifactId>clickhouse-integration-spark_2.11</artifactId>-->
+        <!--    <version>2.4.0</version>-->
+        <!--</dependency>-->
+
 
         <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
         <dependency>
@@ -272,7 +328,6 @@
             <artifactId>commons-compress</artifactId>
             <version>1.18</version>
         </dependency>
-
 
     </dependencies>
 
@@ -321,17 +376,26 @@
             </plugins>
         </pluginManagement>
 
-        <!--<plugins>-->
-        <!--    <plugin>-->
-        <!--        <artifactId>maven-assembly-plugin</artifactId>-->
-        <!--        <configuration>-->
-        <!--            <descriptorRefs>-->
-        <!--                <descriptorRef>jar-with-dependencies</descriptorRef>-->
-        <!--            </descriptorRefs>-->
-        <!--        </configuration>-->
-        <!--    </plugin>-->
-        <!--</plugins>-->
+        <!-- 打包不带依赖包 -->
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <!--<configuration>-->
+                <!--    <descriptorRefs>-->
+                <!--        <descriptorRef>jar-with-dependencies</descriptorRef>-->
+                <!--    </descriptorRefs>-->
+                <!--</configuration>-->
+            </plugin>
+        </plugins>
 
+        <!-- 打包带依赖包 -->
         <!--<plugins>-->
         <!--    <plugin>-->
         <!--        <groupId>org.apache.maven.plugins</groupId>-->

@@ -55,10 +55,10 @@ public class SparkSQL {
         // spark.sql("drop table if exists tmp.transactions_limit");
         sqlDFPart.write().mode(SaveMode.Overwrite).saveAsTable("tmp.transactions_limit");  // spark默认存储格式为parquet
         sqlDFPart.limit(5).write()
+                .mode(SaveMode.Overwrite)
                 .option("header", "true")  // 是否写入header
                 .option("delimiter", ",")   // 默认以”,”分割
                 .option("timestampFormat", "yyyy/MM/dd HH:mm:ss ZZ")    // 需要添加该选项，否则报错如下：Exception in thread "main" java.lang.IllegalArgumentException: Illegal pattern component: XXX
-                .mode(SaveMode.Overwrite)
                 .csv("file:///E:/Codes/Java/big-data/data/hive_data");  // 存储的为路径，程序会在路径下自动生成csv文件，和hdfs目录结构一致
         // .csv("file:///E:/Codes/Java/big-data/data/hive_data.csv");  // 不能指定文件名
         // .csv("hive_data.csv");  // 默认存储到hdfs路径

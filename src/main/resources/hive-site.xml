@@ -56,7 +56,7 @@
   </property>
   <property>
     <name>hive.exec.reducers.max</name>
-    <value>1099</value>
+    <value>999</value>
   </property>
   <property>
     <name>hive.vectorized.groupby.checkinterval</name>
@@ -72,7 +72,7 @@
   </property>
   <property>
     <name>hive.vectorized.execution.enabled</name>
-    <value>true</value>
+    <value>false</value>
   </property>
   <property>
     <name>hive.vectorized.execution.reduce.enabled</name>
@@ -82,10 +82,7 @@
     <name>hive.merge.mapfiles</name>
     <value>true</value>
   </property>
-  <property>
-    <name>hive.merge.mapredfiles</name>
-    <value>false</value>
-  </property>
+  <!--'hive.merge.mapredfiles', originally set to 'false' (non-final), is overridden below by a safety valve-->
   <property>
     <name>hive.cbo.enable</name>
     <value>false</value>
@@ -102,10 +99,7 @@
     <name>hive.limit.pushdown.memory.usage</name>
     <value>0.1</value>
   </property>
-  <property>
-    <name>hive.merge.sparkfiles</name>
-    <value>true</value>
-  </property>
+  <!--'hive.merge.sparkfiles', originally set to 'true' (non-final), is overridden below by a safety valve-->
   <property>
     <name>hive.merge.smallfiles.avgsize</name>
     <value>16777216</value>
@@ -140,11 +134,11 @@
   </property>
   <property>
     <name>spark.executor.memory</name>
-    <value>6442450944</value>
+    <value>15032385536</value>
   </property>
   <property>
     <name>spark.driver.memory</name>
-    <value>536870912</value>
+    <value>3489660928</value>
   </property>
   <property>
     <name>spark.executor.cores</name>
@@ -152,11 +146,11 @@
   </property>
   <property>
     <name>spark.yarn.driver.memoryOverhead</name>
-    <value>128</value>
+    <value>768</value>
   </property>
   <property>
     <name>spark.yarn.executor.memoryOverhead</name>
-    <value>1024</value>
+    <value>2048</value>
   </property>
   <property>
     <name>spark.dynamicAllocation.enabled</name>
@@ -184,7 +178,7 @@
   </property>
   <property>
     <name>hive.zookeeper.quorum</name>
-    <value>hadoop-prod02,hadoop-prod05,hadoop-prod03</value>
+    <value>hadoop-prod06,hadoop-prod04,hadoop-prod03</value>
   </property>
   <property>
     <name>hive.zookeeper.client.port</name>
@@ -196,7 +190,7 @@
   </property>
   <property>
     <name>hbase.zookeeper.quorum</name>
-    <value>hadoop-prod02,hadoop-prod05,hadoop-prod03</value>
+    <value>hadoop-prod06,hadoop-prod04,hadoop-prod03</value>
   </property>
   <property>
     <name>hbase.zookeeper.property.clientPort</name>
@@ -225,5 +219,25 @@
   <property>
     <name>hive.exec.parallel</name>
     <value>true</value>
+  </property>
+  <property>
+    <name>hive.cli.print.current.db</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>hive.merge.mapredfiles</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>hive.merge.tezfiles</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>hive.merge.sparkfiles</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>tez.am.resource.memory.mb</name>
+    <value>4096</value>
   </property>
 </configuration>

@@ -9,6 +9,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
+import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -23,6 +24,7 @@ import scala.Tuple2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,22 +35,24 @@ import static org.apache.spark.sql.functions.col;
 
 public class FindAssociationRules {
 
-    public final static int MAX_COMBINATION_NUM = 10;
+    private final static int MAX_COMBINATION_NUM = 10;
 
     public static Dataset<Row> getDataset(SparkSession spark) {
-        Dataset<Row> sqlDF = spark.sql("select * from tmp.transactions");
+        // Dataset<Row> sqlDF = spark.sql("select * from tmp.transactions");
+        //
+        // sqlDF.printSchema();
+        // // sqlDF.show(10);
+        // // sqlDF.select("items").show(10);
+        // // sqlDF.select(col("visitid"), col("items")).show(5);
+        // return sqlDF.select("items");
 
-        sqlDF.printSchema();
-        // sqlDF.show(10);
-        // sqlDF.select("items").show(10);
-        // sqlDF.select(col("visitid"), col("items")).show(5);
-        return sqlDF.select("items");
+        return spark.sql("select clientids as items from tmp.transactions_zy");
     }
 
     public static JavaRDD<Row> createLk(SparkSession spark, JavaRDD<Row> transactions, long rowNum, double minSupport, int k) {
         // 内置的累加器有三种，LongAccumulator、DoubleAccumulator、CollectionAccumulator
         // LongAccumulator: 数值型累加
-        LongAccumulator combinationNum = spark.sparkContext().longAccumulator("combinationNum");
+        // LongAccumulator combinationNum = spark.sparkContext().longAccumulator("combinationNum");
 
         // map
         JavaPairRDD<List<String>, Integer> combinationGroupOne = transactions.flatMapToPair(new PairFlatMapFunction<Row, List<String>, Integer>() {
@@ -58,21 +62,20 @@ public class FindAssociationRules {
                 String transaction = row.getAs("items");
 
                 List<String> itemsList = Arrays.asList(transaction.split(","));
-                List<List<String>> combinations = Combination.findSortedCombinations(itemsList, k);
-                for (List<String> combination : combinations) {
-                    if (combination.size() > 0) {
+                if (k == 1) {
+                    for (String item : itemsList) {
+                        List<String> combination = new ArrayList<>(Collections.singletonList(item));
                         result.add(new Tuple2<>(combination, 1));
-
-                        // 累加器计数，只有action操作才会触发累加器的值
-                        combinationNum.add(1);
+                    }
+                } else {
+                    List<List<String>> combinations = Combination.findSortedCombinations(itemsList, k);
+                    for (List<String> combination : combinations) {
+                        if (combination.size() > 0) {
+                            result.add(new Tuple2<>(combination, 1));
+                        }
                     }
                 }
 
-
-                // if (combinationNum.value() % 10000 == 0 || combinationNum.value() == rowNum) {
-                //     float rateOfProgress = (float) combinationNum.value() / rowNum * 100;
-                //     System.out.println(String.format("STAGE-%s: Rate Of Progress %d(%.2f%%)", k, combinationNum.value(), rateOfProgress));
-                // }
                 return result.iterator();
             }
         });
@@ -86,9 +89,20 @@ public class FindAssociationRules {
         });
 
         JavaPairRDD<List<String>, Integer> frequentSet = ck.filter(s -> s._2.doubleValue() / rowNum > minSupport);
-        for (Tuple2<List<String>, Integer> tuple : frequentSet.collect()) {
-            System.out.println(tuple._1 + ": " + tuple._2);
-        }
+        int saveRowNum = (int) frequentSet.count();
+        System.out.println("-- Output --" + k);
+        System.out.println("Total combination save " + saveRowNum + " rows.");
+
+        // for (Tuple2<List<String>, Integer> tuple : frequentSet.collect()) {
+        //     System.out.println(tuple._1 + ": " + tuple._2);
+        // }
+
+        // frequentSet.foreach(new VoidFunction<Tuple2<List<String>, Integer>>() {
+        //     @Override
+        //     public void call(Tuple2<List<String>, Integer> listIntegerTuple2) throws Exception {
+        //         System.out.println(listIntegerTuple2);
+        //     }
+        // });
 
         // JavaPair convert JavaRDD<Row>
         JavaRDD<Row> rowRDD = frequentSet.map(new Function<Tuple2<List<String>, Integer>, Row>() {
@@ -115,6 +129,9 @@ public class FindAssociationRules {
         // JavaRDD<String> transactions = df.toJavaRDD().map(s -> s.getString(0));
         // JavaRDD<String> transactions = df.toJavaRDD().map(s -> s.getAs("items"));
         JavaRDD<Row> transactions = df.toJavaRDD();
+        System.out.println("JavaRDD<Row> transactions's partition size: " + transactions.partitions().size());
+        transactions = transactions.repartition(100);
+        System.out.println("JavaRDD<Row> transactions's partition size: " + transactions.partitions().size());
 
         // result DataFrame
         ArrayList<StructField> fields = new ArrayList<>();
@@ -139,15 +156,15 @@ public class FindAssociationRules {
             frequentSetDF = frequentSetDF.unionAll(frequentSetDS);
         }
 
-        // save
+        // save, 有时候会报权限不足的错误或警告
         // frequentSet.saveAsTextFile("/user/work/tmp/frequent_set");
         frequentSetDF.write().mode(SaveMode.Overwrite).saveAsTable("tmp.frequent_set");  // 如果表不存在，会默认创建，默认格式为parquet
         // result1.write().partitionBy("dt").format("orc").mode(SaveMode.Overwrite).saveAsTable("tmp.frequent_set");  // 如果表不存在，会默认创建，默认格式为parquet
 
-        frequentSetDF.registerTempTable("frequent_set");
+        // frequentSetDF.registerTempTable("frequent_set");  // 已过时
+        frequentSetDF.createOrReplaceTempView("frequent_set");
         spark.sql("drop table if exists tmp.frequent_set_tmp");
-        spark.sql("create table tmp.frequent_set_tmp stored as parquet as select t.*,t.num/t.row_num as support from frequent_set t");  // 默认textfile，需要额外指定存在格式
-
+        spark.sql("create table tmp.frequent_set_tmp stored as parquet as select t.*,t.num/t.row_num as support from frequent_set t");  // 默认textfile，需要额外指定存储格式
     }
 
     public static void runFindAssociationRules(SparkSession spark, double minConfidence) {

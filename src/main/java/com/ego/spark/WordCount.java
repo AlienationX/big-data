@@ -3,6 +3,7 @@ package com.ego.spark;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.api.java.function.PairFunction;
@@ -45,6 +46,14 @@ public class WordCount {
 
         runHelloWorld(spark);
 
+        List<Integer> inputData = new ArrayList<>();
+        inputData.add(10);
+        inputData.add(90);
+        inputData.add(20);
+        JavaRDD<Integer> myRdd = JavaSparkContext.fromSparkContext(spark.sparkContext()).parallelize(inputData);
+        Integer result = myRdd.reduce(Integer::sum);
+        System.out.println(result);
+
         spark.stop();
     }
 
@@ -80,7 +89,7 @@ public class WordCount {
 
         List<Tuple2<String, Integer>> output = counts.filter(s -> !"".equals(s._1())).collect();
         for (Tuple2<?, ?> tuple : output) {
-            System.out.println(tuple._1() + ": " + tuple._2());
+            System.out.println(tuple._1 + ": " + tuple._2);
         }
 
 

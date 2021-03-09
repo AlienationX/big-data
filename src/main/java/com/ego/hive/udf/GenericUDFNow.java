@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 
 @Description(
         name = "now",
-        value = "_FUNC_() -no parameters required, "
-                + "returns current timestamp",
+        value = "_FUNC_() - no parameters required, returns current timestamp",
         extended = "Example:\n"
                 + " > SELECT _FUNC_() FROM src;"
 )
+
 public class GenericUDFNow extends GenericUDF {
 
     @Override
@@ -31,7 +31,7 @@ public class GenericUDFNow extends GenericUDF {
         // 返回字符类型：PrimitiveObjectInspectorFactory.javaStringObjectInspector
         // 返回是否类型：PrimitiveObjectInspectorFactory.javaBooleanObjectInspector
         // javaBooleanObjectInspector 和 writableBooleanObjectInspector 都可以
-        return PrimitiveObjectInspectorFactory.javaBooleanObjectInspector;
+        return PrimitiveObjectInspectorFactory.javaTimestampObjectInspector;
     }
 
     @Override
