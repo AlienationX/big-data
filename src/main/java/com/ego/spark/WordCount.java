@@ -8,12 +8,15 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.api.java.function.VoidFunction;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -44,7 +47,8 @@ public class WordCount {
                 .enableHiveSupport()
                 .getOrCreate();
 
-        runHelloWorld(spark);
+        // runHelloWorld(spark);
+        getRowList(spark);
 
         List<Integer> inputData = new ArrayList<>();
         inputData.add(10);
@@ -52,9 +56,22 @@ public class WordCount {
         inputData.add(20);
         JavaRDD<Integer> myRdd = JavaSparkContext.fromSparkContext(spark.sparkContext()).parallelize(inputData);
         Integer result = myRdd.reduce(Integer::sum);
-        System.out.println(result);
+        System.out.println("Sum value: "+result);
 
         spark.stop();
+    }
+
+    private static void getRowList(SparkSession spark){
+        List<List<String>> data = new ArrayList<>();
+        data.add(Arrays.asList("a","a","a"));
+        data.add(Arrays.asList("b","b"));
+        data.add(Arrays.asList("c","a", "b"));
+        JavaRDD<List<String>> dataRDD = JavaSparkContext.fromSparkContext(spark.sparkContext()).parallelize(data);
+        JavaRDD<Row> dataRow = dataRDD.map( x-> RowFactory.create(x, x.size()));
+        dataRDD.foreach(x->System.out.println(x));
+        dataRow.foreach(x->System.out.println(x));
+        dataRow.mapToPair(x -> new Tuple2<>(x.getAs(0), x.getInt(1) + ((List) x.getAs(0)).size()))
+                .foreach(x -> System.out.println(x._1 + " size is "+ x._2));
     }
 
     private static void runHelloWorld(SparkSession spark) {

@@ -61,7 +61,7 @@ public class FindAssociationRules {
                 List<Tuple2<List<String>, Integer>> result = new ArrayList<>();
                 String transaction = row.getAs("items");
 
-                List<String> itemsList = Arrays.asList(transaction.split(","));
+                List<String> itemsList = new ArrayList<>(Arrays.asList(transaction.split(",")));
                 if (k == 1) {
                     for (String item : itemsList) {
                         List<String> combination = new ArrayList<>(Collections.singletonList(item));
@@ -130,7 +130,7 @@ public class FindAssociationRules {
         // JavaRDD<String> transactions = df.toJavaRDD().map(s -> s.getAs("items"));
         JavaRDD<Row> transactions = df.toJavaRDD();
         System.out.println("JavaRDD<Row> transactions's partition size: " + transactions.partitions().size());
-        transactions = transactions.repartition(100);
+        transactions = transactions.repartition(32);
         System.out.println("JavaRDD<Row> transactions's partition size: " + transactions.partitions().size());
 
         // result DataFrame

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -85,6 +86,34 @@ public class HelloWorld {
         System.out.println(l1.addAll(l2));
     }
 
+    private static void containsInnerList(){
+        List<List<String>> data1 = new ArrayList<>();
+        data1.add(Arrays.asList("a","b"));
+        data1.add(Arrays.asList("b","c"));
+        data1.add(Arrays.asList("c","a"));
+
+        List<List<String>> data2 = new ArrayList<>();
+        data2.add(Arrays.asList("a","b"));
+        data2.add(Arrays.asList("b"));
+        data2.add(Arrays.asList("c","a"));
+
+        System.out.println(data1);
+        System.out.println(data2);
+        data1.retainAll(data2);  // 可以过滤
+        System.out.println(data1);
+
+        // 可以过滤
+        // List<List<String>> data = new ArrayList<>();
+        // for (List<String> item1: data1){
+        //     for (List<String> item2 : data2) {
+        //         if (item1.equals(item2)){
+        //             data.add(item1);
+        //         }
+        //     }
+        // }
+        // System.out.println(data);
+    }
+
     public static void main(String[] args) {
         System.out.println("Hello World!");
         String a = "a  b c";
@@ -133,9 +162,37 @@ public class HelloWorld {
         System.out.println(StringUtils.isNumeric("123"));
         System.out.println(LocalDate.parse("20201231", DateTimeFormatter.ofPattern("yyyyMMdd")));
 
-
         containsList();
+        containsInnerList();
 
         System.out.println(DigestUtils.md5Hex("i love you"));
+
+        String list = "a b c d";
+        System.out.println("list: " + list.split(" ") + " len: " + list.split(" ").length);
+        System.out.println("list: " + Arrays.asList(list.split(" ")) + " len: " + Arrays.asList(list.split(" ")).size());
+
+        String s1 = "aaa,b,,,d, ,f,   ,h";
+        List<String> s = new ArrayList<>(Arrays.asList(s1.split(",")));
+        System.out.println(s);
+        // for (String txt : s){
+        //     if (txt.trim().equalsIgnoreCase("")){
+        //         s.remove(txt);
+        //     }
+        // }
+        // Iterator<String> iter = s.iterator();
+        // while (iter.hasNext()) {
+        //     String txt = iter.next();
+        //     if (txt.trim().equalsIgnoreCase("")){
+        //         s.remove(txt);
+        //     }
+        // }
+        int len = s.size();
+        for (int i = len - 1; i >= 0; i--) {
+            if (s.get(i).trim().equalsIgnoreCase("")) {
+                s.remove(i);
+            }
+        }
+        System.out.println(s);
+        System.out.println(s.get(0).length());
     }
 }

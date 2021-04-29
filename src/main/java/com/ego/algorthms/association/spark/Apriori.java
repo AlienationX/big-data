@@ -27,6 +27,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/*
+ * 该版本使用List<List<String>>存储ck，推荐使用JavaRDD<List<String>>
+ *
+ */
 
 public class Apriori {
 
@@ -180,7 +184,7 @@ public class Apriori {
         List<List<String>> ck = l1.keys().collect();
 
         //
-        transactions=transactionsFilter(ck, transactions);
+        transactions = transactionsFilter(ck, transactions);
 
         // 计算第二项集及以上
         for (int i = 2; i <= MAX_COMBINATION_NUM; i++) {
@@ -198,7 +202,7 @@ public class Apriori {
             ck = frequentSetPairRDD.keys().collect();
 
             // optimize 优化，根据LK的key过滤dataset每行的数据项目，每次循环缩小遍历的dataset结果集
-            transactions=transactionsFilter(ck, transactions);
+            transactions = transactionsFilter(ck, transactions);
 
             // JavaPair convert JavaRDD<Row>
             JavaRDD<Row> frequentSetRDD = frequentSetPairRDD.map((Function<Tuple2<List<String>, Integer>, Row>) x -> {

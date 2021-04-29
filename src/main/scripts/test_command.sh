@@ -53,6 +53,17 @@ time spark2-submit \
 --class com.ego.algorthms.association.spark.Apriori \
 bigdata-1.0-SNAPSHOT.jar tmp.transactions_zy clientids tmp.transactions_zy_set 0.0042857 1
 
+time spark2-submit \
+--master yarn \
+--deploy-mode client \
+--name "HiveToClickhouse" \
+--driver-memory 8g \
+--executor-memory 8g \
+--queue root.workflow \
+--jars clickhouse-native-jdbc-shaded-2.3-stable.jar \
+--class com.ego.spark.DataSyncHiveSqlToClickHouse \
+bigdata-1.0-SNAPSHOT.jar "select * from medical.dwb_master_info t where t.project='funan' and t.etl_source='A01'" test.dwb_master_info
+
 
 ########################################################################################################################
 # execute hadoop jar with libjars
