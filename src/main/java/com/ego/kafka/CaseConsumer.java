@@ -48,7 +48,7 @@ public class CaseConsumer {
 
 
         while (true) {
-            ConsumerRecords<Integer, String> records = consumer.poll(Duration.ofSeconds(1));
+            ConsumerRecords<Integer, String> records = consumer.poll(1);
             // consumer.seekToBeginning(consumer.partitionsFor("test"));
             for (ConsumerRecord<Integer, String> record : records) {
                 System.out.printf("GroupId %s topic %s received message: from partition %s, (%s, %s) at offset %s", record.topic(), record.topic(), record.partition(), record.key(), record.value(), record.offset());

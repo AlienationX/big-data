@@ -119,15 +119,19 @@ public class HadoopUtil {
     }
 
     // spark conf
-    public static SparkConf getSparkConf() {
+    public static SparkConf getSparkConf(String appName) {
         // 设置环境变量
         setEnvironment();
 
-        SparkConf sparkConf = new SparkConf();
+        SparkConf sparkConf = new SparkConf().setAppName(appName);
 
         Map<String, String> mapConf = getConfMap();
         for (String k : mapConf.keySet()) {
             sparkConf.set(k, mapConf.get(k));
+        }
+
+        if (isDevelopment()) {
+            sparkConf.setMaster("local[*]");
         }
 
         return sparkConf;

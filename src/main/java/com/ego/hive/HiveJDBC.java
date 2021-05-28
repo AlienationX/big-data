@@ -1,7 +1,6 @@
 package com.ego.hive;
 
 import com.alibaba.fastjson.JSON;
-import com.ego.examples.CaseJDBC;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
@@ -18,7 +17,7 @@ import java.util.Map;
 public class HiveJDBC {
 
     // private Logger logger = Logger.getLogger(this.getClass());
-    private static Logger logger = Logger.getLogger(CaseJDBC.class);
+    private static Logger logger = Logger.getLogger(HiveJDBC.class);
 
     // Oracle："oracle.jdbc.driver.OracleDriver" "jdbc:oracle:thin:@localhost:1521:db"
     // SqlServer2000："com.microsoft.jdbc.sqlserver.SQLServerDriver" "jdbc:microsoft:sqlserver://localhost:1433; DatabaseName=db"

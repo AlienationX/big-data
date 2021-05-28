@@ -120,9 +120,7 @@ public class CaseHBase {
             // 扫描器
             System.out.println("---------------------");
             ResultScanner resultScanner = table.getScanner(new Scan());
-            Iterator<Result> results = resultScanner.iterator();
-            while (results.hasNext()) {
-                Result result = results.next();
+            for (Result result : resultScanner) {
                 for (Cell cell : result.listCells()) {
                     System.out.println("rowkey:" + Bytes.toString(CellUtil.cloneRow(cell)) +
                             " family:" + Bytes.toString(CellUtil.cloneFamily(cell)) +

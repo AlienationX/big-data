@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,9 +59,20 @@ public class HelloWorld {
         LocalDateTime dt = LocalDateTime.now();
         System.out.println(dt.getClass());
         System.out.println(dt);
-        System.out.println(Timestamp.valueOf(LocalDateTime.now()));  // 强力推荐
+        System.out.println(Timestamp.valueOf(LocalDateTime.now()));  // 强力推荐，只是去掉中间的T
         System.out.println(LocalDate.now());
         System.out.println(LocalTime.now());
+        LocalDateTime tomorrow = LocalDateTime.of(dt.getYear(), dt.getMonth(), dt.getDayOfMonth() + 1, 0, 0, 0);
+        System.out.println(tomorrow);
+        System.out.println((tomorrow.compareTo(dt)));  // 两个日期相差返回的是天
+        System.out.println(dt.toEpochSecond(ZoneOffset.of("+8")));  // //获取秒数（时间戳）
+        System.out.println(dt.toInstant(ZoneOffset.of("+8")).toEpochMilli());  // //获取毫秒数
+        // System.out.println(tomorrow.getLong() - dt.getLong());
+        System.out.println(LocalDate.of(2020,1,1));
+        System.out.println(LocalDate.parse("2099-12-31"));
+        System.out.println(LocalDateTime.parse("2099-12-31 23:59:59", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        System.out.println(tomorrow.plusDays(-2));  // 日期减2天
+        System.out.println(tomorrow.plusHours(6));  // 日期加6时
         System.out.println("-------------------------");
     }
 
@@ -86,16 +98,16 @@ public class HelloWorld {
         System.out.println(l1.addAll(l2));
     }
 
-    private static void containsInnerList(){
+    private static void containsInnerList() {
         List<List<String>> data1 = new ArrayList<>();
-        data1.add(Arrays.asList("a","b"));
-        data1.add(Arrays.asList("b","c"));
-        data1.add(Arrays.asList("c","a"));
+        data1.add(Arrays.asList("a", "b"));
+        data1.add(Arrays.asList("b", "c"));
+        data1.add(Arrays.asList("c", "a"));
 
         List<List<String>> data2 = new ArrayList<>();
-        data2.add(Arrays.asList("a","b"));
+        data2.add(Arrays.asList("a", "b"));
         data2.add(Arrays.asList("b"));
-        data2.add(Arrays.asList("c","a"));
+        data2.add(Arrays.asList("c", "a"));
 
         System.out.println(data1);
         System.out.println(data2);

@@ -120,7 +120,6 @@ public class GroupByMultiColumns {
         String toDbName = toTable.split(p)[0];
         String toTbName = toTable.split(p)[1];
 
-
         Job job = Job.getInstance(conf, "Group By Multi Keys");
         job.setNumReduceTasks(1);
 
@@ -147,6 +146,5 @@ public class GroupByMultiColumns {
         HCatOutputFormat.setSchema(job, s);
 
         System.exit(job.waitForCompletion(true) ? 0 : 1);
-
     }
 }
