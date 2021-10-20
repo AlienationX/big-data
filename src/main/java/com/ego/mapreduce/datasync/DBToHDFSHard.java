@@ -51,7 +51,8 @@ public class DBToHDFSHard {
                 "com.mysql.jdbc.Driver",
                 "jdbc:mysql://hadoop-dev04:3306/repository?characterEncoding=utf8&useSSL=false",
                 "todo",
-                "todolist");
+                "todolist"
+        );
 
         String outputStr = "tmp/mysql_users";
         FileSystem fs = FileSystem.get(conf);

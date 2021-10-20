@@ -32,7 +32,6 @@ public class MLFPGrowth {
                 .setItemsCol("items")
                 .setMinSupport(minSupport)
                 .setMinConfidence(minConfidence)
-                .setNumPartitions(numPartitions)
                 .fit(itemsDF);
 
         if (numPartitions != 0) {
@@ -56,9 +55,13 @@ public class MLFPGrowth {
 
         Dataset<Row> result = model.freqItemsets();
         result.createOrReplaceTempView("tmp_fp_growth");
-        Dataset<Row> df = spark.sql("select t.*, size(t.items) as k from tmp_fp_growth t where size(t.items)>=2");
-        df.printSchema();
-        df.show(100);
+
+        // Dataset<Row> df = spark.sql("select t.*, size(t.items) as k from tmp_fp_growth t where size(t.items)>=2");
+        // df.printSchema();
+        // df.show(100);
+
+        spark.sql("drop table if exists tmp.tmp_fp_growth");
+        spark.sql("create table tmp.tmp_fp_growth stored as parquet as select t.*, size(t.items) as k from tmp_fp_growth t where size(t.items)>=2");
 
     }
 }

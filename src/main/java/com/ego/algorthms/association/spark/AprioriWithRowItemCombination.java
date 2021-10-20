@@ -1,7 +1,6 @@
 package com.ego.algorthms.association.spark;
 
-import com.ego.HadoopUtil;
-import com.ego.algorthms.association.Combination;
+import com.ego.algorthms.association.CombinationWithStack;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -32,6 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.ego.HadoopUtil;
+import com.ego.algorthms.association.Combination;
+
 /**
  * 基于每行数据的item进行组合
  * 两两组合公式：N*(N-1)/2
@@ -39,6 +41,13 @@ import java.util.Set;
  * 只计算真实存在的组合，会有重复最终ck需要去重，但是两两组合的数量确实会少些
  * -- 如果一行的最大两目数是2000，那二项集项目就有1999000的组合
  * -- 2000*1999/2 = 1999000
+ *
+ * 2个关键的数据变量
+ * JavaRDD<Row>                       transactions         原始数据集
+ * JavaRDD<List<String>               ck                   k项频繁项集
+ *
+ * 每行数据永远是基于1项集生成2项集，基于1项集生成3项集，优化点在于每次循环后使用ckUniqueList再过滤每行的数据。
+ * 符合条件的1项集项目越少，过滤后的每行数据的项目越少，组合也就越少，效果显著。推荐。
  */
 
 public class AprioriWithRowItemCombination {
@@ -70,10 +79,11 @@ public class AprioriWithRowItemCombination {
 
         return transactions.map(row -> {
             // 两个list求交集
-            List<String> itemList = new ArrayList<>(row.getAs(0));
-            itemList.retainAll(ckUniqueList);
-            // List<String> intersection = itemList.stream().filter(item -> ckUniqueList.contains(item)).collect(toList());
-            return RowFactory.create(itemList);
+            List<String> itemsList = new ArrayList<>(row.getAs(0));
+            itemsList.retainAll(ckUniqueList);
+            // List<String> intersection = itemsList.stream().filter(item -> ckUniqueList.contains(item)).collect(toList());
+            Collections.sort(itemsList);  // 必须，组合的核心算法需要使用排序的list
+            return RowFactory.create(itemsList);
         });
     }
 
@@ -83,12 +93,11 @@ public class AprioriWithRowItemCombination {
         LongAccumulator accumulatorNum = spark.sparkContext().longAccumulator("accumulatorNum");
         accumulatorNum.setValue(0);
 
-        // JavaPairRDD<Integer, List<String>> integerListJavaPairRDD =
-        transactions.mapToPair(row -> {
+        JavaPairRDD<Integer, String> tmpData = transactions.mapToPair(row -> {
             accumulatorNum.add(1);
             return new Tuple2<>(((List) row.getAs(0)).size(), row.getAs(0).toString());
-        })
-                .sortByKey(false)
+        });
+        tmpData.cache().sortByKey(false)  // sortByKey会触发action
                 .map(x -> x._1)
                 .take(5)
                 .forEach(System.out::println);
@@ -112,8 +121,8 @@ public class AprioriWithRowItemCombination {
     public static JavaPairRDD<List<String>, Integer> createL1(JavaRDD<Row> transactions, long rowNum, double minSupport) {
         JavaPairRDD<List<String>, Integer> c1Data = transactions.flatMapToPair(row -> {
             List<Tuple2<List<String>, Integer>> result = new ArrayList<>();
-            List<String> itemList = (List) row.getAs(0);
-            for (String item : itemList) {
+            List<String> itemsList = (List) row.getAs(0);
+            for (String item : itemsList) {
                 List<String> combination = new ArrayList<>(Collections.singletonList(item));
                 // List<String> combination = Collections.singletonList(item);
                 result.add(new Tuple2<>(combination, 1));
@@ -174,57 +183,83 @@ public class AprioriWithRowItemCombination {
         return ck;
     }
 
-    public static JavaPairRDD<List<String>, Integer> createLK(SparkSession spark, JavaRDD<Row> transactions, JavaRDD<List<String>> ck, long rowNum, double minSupport, int k) {
-        // 计数
+    public static JavaPairRDD<List<String>, Integer> createLK(JavaRDD<Row> transactions, long rowNum, double minSupport, int k, SparkSession spark) {
 
-        // 广播一个rdd进行计算，广播ck
-        // ClassTag tag = scala.reflect.ClassTag$.MODULE$.apply(String.class);
-        // Broadcast broadcastCK = spark.sparkContext().broadcast("words",tag);
-        // Broadcast<List<List<String>>> broadcastCK = JavaSparkContext.fromSparkContext(spark.sparkContext()).broadcast(ck.collect());
+        // JavaRDD<List<String>> transactionsGroups = transactions.flatMap(row -> {
+        //     List<String> itemsList = new ArrayList<>(row.getAs(0));
+        //     // TODO 组合算法是提升效率的关键，好的组合算法可以大大提高执行效率
+        //     List<List<String>> combinations = Combination.findSortedCombinationsOptimize(itemsList, k);
+        //     return combinations.iterator();
+        // });
+        // transactionsGroups.cache();
+        // System.out.println("Output>>> C" + k + " rows: " + transactionsGroups.count());
         //
-        // JavaPairRDD<List<String>, Integer> ckData = transactions.flatMapToPair(row -> {
+        // // 求和
+        // JavaPairRDD<List<String>, Integer> ckWithNum = transactionsGroups
+        //         .mapToPair(x -> new Tuple2<>(x, 1))
+        //         .reduceByKey(Integer::sum);
+        // System.out.println("Output>>> C" + k + " size: " + ckWithNum.count());
+        //
+        // // 过滤，生成lk
+        // JavaPairRDD<List<String>, Integer> lk = ckWithNum.filter(x -> x._2.doubleValue() / rowNum >= minSupport);
+        // System.out.println("Output>>> L" + k + " size: " + lk.count());
+
+        // JavaPairRDD<List<String>, Integer> transactionsGroups = transactions.flatMapToPair(row -> {
+        //     List<String> itemsList = new ArrayList<>(row.getAs(0));
+        //     // TODO 组合算法是提升效率的关键，好的组合算法可以大大提高执行效率
+        //     List<List<String>> combinations = Combination.findSortedCombinationsOptimize(itemsList, k);
+        //
         //     List<Tuple2<List<String>, Integer>> result = new ArrayList<>();
-        //     String transaction = row.getAs(0);
-        //
-        //     List<String> itemList = new ArrayList<>(Arrays.asList(transaction.split(",")));
-        //     for (List<String> combination : broadcastCK.value()) {
-        //         // 瓶颈
-        //         if (itemList.containsAll(combination)) {
-        //             result.add(new Tuple2<>(combination, 1));
-        //         }
+        //     for (List<String> combination : combinations) {
+        //         result.add(new Tuple2<>(combination, 1));
         //     }
         //     return result.iterator();
         // });
+        // transactionsGroups.cache();
+        // System.out.println("Output>>> C" + k + " rows: " + transactionsGroups.count());
+        //
+        // // 求和
+        // JavaPairRDD<List<String>, Integer> ckWithNum = transactionsGroups.reduceByKey(Integer::sum);
+        // System.out.println("Output>>> C" + k + " size: " + ckWithNum.count());
+        //
+        // // 过滤，生成lk
+        // JavaPairRDD<List<String>, Integer> lk = ckWithNum.filter(x -> x._2.doubleValue() / rowNum >= minSupport);
+        // System.out.println("Output>>> L" + k + " size: " + lk.count());
 
-        // 广播一个rdd进行计算，广播transactions
-        Broadcast<List<Row>> broadcastTransactions = JavaSparkContext.fromSparkContext(spark.sparkContext()).broadcast(transactions.collect());
+        LongAccumulator accumulatorCkRows = spark.sparkContext().longAccumulator("accumulatorNum");
+        accumulatorCkRows.setValue(0);
+        LongAccumulator accumulatorCkSize = spark.sparkContext().longAccumulator("accumulatorNum");
+        accumulatorCkSize.setValue(0);
 
-        JavaPairRDD<List<String>, Integer> ckData = ck.flatMapToPair(x -> {
+        JavaPairRDD<List<String>, Integer> lk = transactions.flatMapToPair(row -> {
+            List<String> itemsList = new ArrayList<>(row.getAs(0));
+            // TODO 组合算法是提升效率的关键，好的组合算法可以大大提高执行效率
+            // List<List<String>> combinations = Combination.findSortedCombinationsOptimize(itemsList, k);
+            CombinationWithStack comb = new CombinationWithStack();
+            comb.findCombinations(itemsList, k, 0, 0);
+            List<List<String>> combinations = comb.result;
+
             List<Tuple2<List<String>, Integer>> result = new ArrayList<>();
-
-            for (Row row : broadcastTransactions.value()) {
-                List<String> itemList = row.getList(0);
-                // 瓶颈
-                if (itemList.containsAll(x)) {
-                    result.add(new Tuple2<>(x, 1));
-                }
+            for (List<String> combination : combinations) {
+                accumulatorCkRows.add(1);
+                result.add(new Tuple2<>(combination, 1));
             }
             return result.iterator();
+        }).reduceByKey((v1, v2) -> {
+            accumulatorCkSize.add(1);
+            return v1 + v2;
+        }).filter(x -> {
+            // if (x._2.doubleValue() / rowNum >= minSupport) {
+            //     accumulatorLkSize.add(1);
+            //     return true;
+            // }
+            // return false;
+            return x._2.doubleValue() / rowNum >= minSupport;
         });
-        ckData.cache();
-        System.out.println("Output>>> C" + k + " rows: " + ckData.count());
-
-        // 下面两个的foreach的区别？
-        // ckData.collect().forEach(System.out::println);
-        // ckData.foreach(System.out::println);
-
-        // 求和
-        JavaPairRDD<List<String>, Integer> ckWithNum = ckData.reduceByKey(Integer::sum);
-        System.out.println("Output>>> C" + k + " size: " + ckWithNum.count());
-
-        // 过滤，生成lk
-        JavaPairRDD<List<String>, Integer> lk = ckWithNum.filter(x -> x._2.doubleValue() / rowNum >= minSupport);
-        System.out.println("Output>>> L" + k + " size: " + lk.count());
+        long num = lk.cache().count();
+        long num1 = accumulatorCkRows.value();
+        long num2 = accumulatorCkSize.value();
+        System.out.println(String.format("Output>>> C%d rows: %d, C%d size: %d, L%d size: %d.", k, num1, k, num2, k, num));
 
         return lk;
     }
@@ -246,28 +281,28 @@ public class AprioriWithRowItemCombination {
         // string转换成list
         transactions = transactions.map(row -> {
             // 数据集是字符串格式（如果项目包含逗号会存在问题）
-            List<String> itemList = new ArrayList<>(Arrays.asList(row.getAs(0).toString().split(",")));
+            List<String> itemsList = new ArrayList<>(Arrays.asList(row.getAs(0).toString().split(",")));
             // 数据集直接使用list，强烈推荐推荐
-            // List<String> itemList = new ArrayList<>(row.getList(0));
+            // List<String> itemsList = new ArrayList<>(row.getList(0));
             // 1. item去重
-            Set<String> set = new HashSet<>(itemList);
-            itemList = new ArrayList<>(set);
+            Set<String> set = new HashSet<>(itemsList);
+            itemsList = new ArrayList<>(set);
             // 2. 删除白名单
-            itemList.removeAll(getWhiteList());
+            itemsList.removeAll(getWhiteList());
             // 3. 删除多空格和多null，最好使用正则
-            // for (String item : itemList) {
+            // for (String item : itemsList) {
             //     if (item.trim().equalsIgnoreCase("") || item.equalsIgnoreCase("null")) {
-            //         itemList.remove(item);
+            //         itemsList.remove(item);
             //     }
             // }
-            int length = itemList.size();
+            int length = itemsList.size();
             for (int i = length - 1; i >= 0; i--) {
-                if (itemList.get(i).trim().equalsIgnoreCase("") || itemList.get(i).equalsIgnoreCase("null")) {
-                    itemList.remove(i);
+                if (itemsList.get(i).trim().equalsIgnoreCase("") || itemsList.get(i).equalsIgnoreCase("null")) {
+                    itemsList.remove(i);
                 }
             }
-            // return RowFactory.create(String.join(",", itemList));
-            return RowFactory.create(itemList);
+            // return RowFactory.create(String.join(",", itemsList));
+            return RowFactory.create(itemsList);
         });
         // Row类型print出来是带中括号[]，类似数组，需要注意
         // transactions.take(2).forEach(System.out::println);
@@ -305,39 +340,36 @@ public class AprioriWithRowItemCombination {
         JavaRDD<List<String>> ck = l1.map(x -> x._1);
 
         ck.cache();
-        saveCkData(ck, spark, 1);
+        // saveCkData(ck, spark, 1);
 
         // 计算第二项集及以上
         for (int i = 2; i <= MAX_COMBINATION_NUM; i++) {
             int k = i;
-            // optimize 优化，根据LK的key过滤dataset每行的数据项目，每次循环缩小遍历的dataset结果集，提高createLK的containsAll效率
+
+            // optimize 优化，根据LK的key过滤dataset每行的数据项目，每次循环缩小遍历的dataset结果集，减小组合数提高效率
             transactions = transactionsFilter(ck, transactions)
                     .filter(row -> ((List) row.getAs(0)).size() > k);
 
-            // 根据ck转换transactions结果
-
-            // JavaRDD<List<List<String>>> transactionsConvert = transactions.map( row -> {
-            //
-            // });
+            if (transactions.isEmpty()) {
+                System.out.println("Output>>> " + k + " Transactions no data, abort.");
+                break;
+            }
 
             // 倒序显示项目数最多的5条
             showTransactionsOverview(transactions, spark, k);
 
-            ck = createCK(spark, transactions, ck, k);
-
-            ck.cache();
-            saveCkData(ck, spark, k);
-
-            JavaPairRDD<List<String>, Integer> frequentSetPairRDD = createLK(spark, transactions, ck, rowNum, minSupport, k);
+            JavaPairRDD<List<String>, Integer> frequentSetPairRDD = createLK(transactions, rowNum, minSupport, k, spark);
             if (frequentSetPairRDD.isEmpty()) {
                 System.out.println("Output>>> L" + k + " no data, abort.");
                 break;
             }
 
-            // save k项集，以便计算k+1项集;
+            // optimize 优化，save k项集，以便过滤transactions结果集;
             frequentSetPairRDD.cache();
             // ck = frequentSetPairRDD.keys().collect();
             ck = frequentSetPairRDD.map(x -> x._1);
+            ck.cache();
+            // saveCkData(ck, spark, k);
 
             // JavaPair convert JavaRDD<Row>
             JavaRDD<Row> frequentSetRDD = frequentSetPairRDD.map((Function<Tuple2<List<String>, Integer>, Row>) x -> {

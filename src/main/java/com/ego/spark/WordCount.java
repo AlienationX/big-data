@@ -68,7 +68,7 @@ public class WordCount {
         data.add(Arrays.asList("c","a", "b"));
         JavaRDD<List<String>> dataRDD = JavaSparkContext.fromSparkContext(spark.sparkContext()).parallelize(data);
         JavaRDD<Row> dataRow = dataRDD.map( x-> RowFactory.create(x, x.size()));
-        dataRDD.foreach(x->System.out.println(x));
+        dataRDD.foreach(System.out::println);
         dataRow.foreach(x->System.out.println(x));
         dataRow.mapToPair(x -> new Tuple2<>(x.getAs(0), x.getInt(1) + ((List) x.getAs(0)).size()))
                 .foreach(x -> System.out.println(x._1 + " size is "+ x._2));

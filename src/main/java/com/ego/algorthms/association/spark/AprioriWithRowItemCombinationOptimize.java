@@ -35,7 +35,9 @@ import java.util.Set;
  * 3个关键的数据变量
  * JavaRDD<Row>                       transactions         原始数据集
  * JavaRDD<List<String>               ck                   k项频繁项集
- * JavaPairRDD<Integer, List<String>  transactionsPairRDD  基于ck组合的数据集
+ * JavaRDD<Row>                       transactionsWithCk  基于ck组合的数据集，例如[[a,b], [a,c], [a,d], [b,c], [b,d], [cd]]
+ *
+ * 每行数据基于1项集生成2项集，基于2项集生成3项集（效果不理想，生成的组合数还是太多，不推荐）
  */
 
 public class AprioriWithRowItemCombinationOptimize {

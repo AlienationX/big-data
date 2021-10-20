@@ -5,11 +5,13 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -70,6 +72,8 @@ public class HelloWorld {
         // System.out.println(tomorrow.getLong() - dt.getLong());
         System.out.println(LocalDate.of(2020,1,1));
         System.out.println(LocalDate.parse("2099-12-31"));
+        System.out.println(LocalDateTime.ofInstant(Instant.ofEpochMilli(1598432983228L), ZoneOffset.of("+8")));
+        System.out.println(LocalDateTime.ofEpochSecond(1598432983228L/1000, 0,ZoneOffset.of("+8")));
         System.out.println(LocalDateTime.parse("2099-12-31 23:59:59", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         System.out.println(tomorrow.plusDays(-2));  // 日期减2天
         System.out.println(tomorrow.plusHours(6));  // 日期加6时
@@ -206,5 +210,9 @@ public class HelloWorld {
         }
         System.out.println(s);
         System.out.println(s.get(0).length());
+
+        String mm = "101";
+        mm = String.format("%5s", mm).replace(" ","0");
+        System.out.println(mm);
     }
 }

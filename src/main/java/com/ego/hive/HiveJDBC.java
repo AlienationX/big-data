@@ -28,8 +28,8 @@ public class HiveJDBC {
     private static String JDBC_DRIVER = "org.apache.hive.jdbc.HiveDriver";
     private static String URL = "jdbc:hive2://hadoop-prod05:10000/default";    // hive
     // private static String URL = "jdbc:hive2://hadoop-dev03:21050/;auth=noSasl";  // 可以直接使用impala
-    private static String USER = "work";
-    private static String PWD = "";
+    private static String USER = "reader";
+    private static String PWD = "reader123";
 
 
     public static void main(String[] args) {

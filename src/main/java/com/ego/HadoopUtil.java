@@ -149,6 +149,7 @@ public class HadoopUtil {
                     .master("local[*]")
                     .appName(appName)
                     .config("spark.some.config.option", "some-value")
+                    .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
                     .enableHiveSupport()
                     .getOrCreate();
         } else {
@@ -156,6 +157,7 @@ public class HadoopUtil {
                     .builder()
                     .appName(appName)
                     .config("spark.some.config.option", "some-value")
+                    .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
                     .enableHiveSupport()
                     .getOrCreate();
         }
