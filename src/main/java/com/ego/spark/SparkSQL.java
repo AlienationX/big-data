@@ -19,8 +19,8 @@ public class SparkSQL {
                 .enableHiveSupport()
                 .getOrCreate();
 
-        // runHiveSQL(spark);
-        runSaveCsv(spark);
+        runHiveSQL(spark);
+        // runSaveCsv(spark);
 
         spark.stop();
     }

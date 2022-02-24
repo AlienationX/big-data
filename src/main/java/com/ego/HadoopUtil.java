@@ -5,6 +5,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
 import org.apache.spark.sql.SparkSession;
 
 import java.io.FileInputStream;
@@ -150,6 +151,8 @@ public class HadoopUtil {
                     .appName(appName)
                     .config("spark.some.config.option", "some-value")
                     .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+                    // .config("spark.driver.userClassPathFirst", "true")
+                    // .config("spark.executor.userClassPathFirst", "true")
                     .enableHiveSupport()
                     .getOrCreate();
         } else {
@@ -158,6 +161,8 @@ public class HadoopUtil {
                     .appName(appName)
                     .config("spark.some.config.option", "some-value")
                     .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+                    // .config("spark.driver.userClassPathFirst", "true")
+                    // .config("spark.executor.userClassPathFirst", "true")
                     .enableHiveSupport()
                     .getOrCreate();
         }
@@ -167,6 +172,31 @@ public class HadoopUtil {
             spark.conf().set(k, mapConf.get(k));
         }
         return spark;
+    }
+	
+	public static SparkConf setHadoopConfigFile(){
+        // sparkContext.hadoopConfiguration().addResource("core-site.xml");
+        // sparkContext.hadoopConfiguration().addResource("hdfs-site.xml");
+        // sparkContext.hadoopConfiguration().addResource("yarn-site.xml");
+        // sparkContext.hadoopConfiguration().addResource("hive-site.xml");
+        Configuration conf = new Configuration();
+        String folder = "shangrao";
+        if (!folder.isEmpty()) {
+            conf.addResource(folder + "/core-site.xml");
+            conf.addResource(folder + "/hdfs-site.xml");
+            conf.addResource(folder + "/yarn-site.xml");
+            conf.addResource(folder + "/hive-site.xml");
+        }
+        SparkConf sparkConf = new SparkConf().setAppName("SVMEvaluationSparkExample");
+        for (Map.Entry<String, String> c : conf) {
+            // System.out.println(c);
+            System.out.println(c.getKey() + "=" + c.getValue());
+            sparkConf.set(c.getKey(), c.getValue());
+        }
+        sparkConf.setMaster("local");
+        // SparkContext sparkContext = new SparkContext(sparkConf);
+        // sparkContext.hadoopConfiguration().addResource("shangrao/hive-site.xml");
+        return sparkConf;
     }
 
 

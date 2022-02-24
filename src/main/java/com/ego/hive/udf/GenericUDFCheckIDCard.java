@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
+// desc function check_id_card; 会返回value部分的值，但是中文存在乱码问题
+// desc function extended check_id_card; 会返回value和extended的部分的值
 @Description(
         name = "check_id_card",
         value = "_FUNC_(str) - returns int,"
@@ -33,7 +35,7 @@ public class GenericUDFCheckIDCard extends GenericUDF {
     @Override
     public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
         if (arguments.length != 1) {
-            throw new UDFArgumentException("The function requires 1 argument");
+            throw new UDFArgumentException("the function requires 1 argument");
         }
         return PrimitiveObjectInspectorFactory.javaIntObjectInspector;
     }

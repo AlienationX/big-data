@@ -1,7 +1,5 @@
 package com.ego.algorthms.association;
 
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDateTime;
 import java.time.Duration;
 import java.util.List;
@@ -284,7 +282,6 @@ public class Combination {
         System.out.println("Spent time seconds: " + dr.toMillis() / 1000);
     }
 
-    @Test
     public static void test() {
         List<String> list = Arrays.asList("a", "b", "c", "d");
         System.out.println("list=" + list);

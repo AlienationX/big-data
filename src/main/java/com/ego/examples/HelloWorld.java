@@ -70,10 +70,10 @@ public class HelloWorld {
         System.out.println(dt.toEpochSecond(ZoneOffset.of("+8")));  // //获取秒数（时间戳）
         System.out.println(dt.toInstant(ZoneOffset.of("+8")).toEpochMilli());  // //获取毫秒数
         // System.out.println(tomorrow.getLong() - dt.getLong());
-        System.out.println(LocalDate.of(2020,1,1));
+        System.out.println(LocalDate.of(2020, 1, 1));
         System.out.println(LocalDate.parse("2099-12-31"));
         System.out.println(LocalDateTime.ofInstant(Instant.ofEpochMilli(1598432983228L), ZoneOffset.of("+8")));
-        System.out.println(LocalDateTime.ofEpochSecond(1598432983228L/1000, 0,ZoneOffset.of("+8")));
+        System.out.println(LocalDateTime.ofEpochSecond(1598432983228L / 1000, 0, ZoneOffset.of("+8")));
         System.out.println(LocalDateTime.parse("2099-12-31 23:59:59", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         System.out.println(tomorrow.plusDays(-2));  // 日期减2天
         System.out.println(tomorrow.plusHours(6));  // 日期加6时
@@ -212,7 +212,17 @@ public class HelloWorld {
         System.out.println(s.get(0).length());
 
         String mm = "101";
-        mm = String.format("%5s", mm).replace(" ","0");
+        mm = String.format("%5s", mm).replace(" ", "0");
         System.out.println(mm);
+
+        for (int i = 0; i < 5; i++) {
+            System.out.println(i);
+        }
+
+        // 需要开启assertion功能，否则assert语句不起作用。jvm增加 -ea
+        assert (2 == 2);
+        assert (2 == 2);  // Exception in thread "main" java.lang.AssertionError at com.ego.examples.HelloWorld.main(HelloWorld.java:224)
+        assert (3 == 2): "这是断言错误"; // java.lang.AssertionError 后面增加 <错误信息表达式>
+
     }
 }

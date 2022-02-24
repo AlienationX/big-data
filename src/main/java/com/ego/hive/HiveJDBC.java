@@ -1,6 +1,7 @@
 package com.ego.hive;
 
 import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
@@ -28,8 +29,8 @@ public class HiveJDBC {
     private static String JDBC_DRIVER = "org.apache.hive.jdbc.HiveDriver";
     private static String URL = "jdbc:hive2://hadoop-prod05:10000/default";    // hive
     // private static String URL = "jdbc:hive2://hadoop-dev03:21050/;auth=noSasl";  // 可以直接使用impala
-    private static String USER = "reader";
-    private static String PWD = "reader123";
+    private static String USER = "work";
+    private static String PWD = "TwkdFNAdS1nIikzk";
 
 
     public static void main(String[] args) {
@@ -49,7 +50,9 @@ public class HiveJDBC {
             }
 
             logger.info("-------------------------------------");
-            String sqlStr = "select * from medical.dim_date where year=?";
+            String sqlStr = "select * from medical.dim_date where year=? limit 10";
+            // String sqlStr = "load data local inpath '/home/share_data/impala_out.csv' overwrite into table tmp.load_test";
+            // String sqlStr = "load data inpath '/user/work/tmp/samples.txt' overwrite into table tmp.load_test";
             PreparedStatement pstmt = conn.prepareStatement(sqlStr);
             pstmt.setInt(1, 2019);
             ResultSet resultSet = pstmt.executeQuery();
@@ -69,6 +72,7 @@ public class HiveJDBC {
                 tableData.add(JSON.toJSONStringWithDateFormat(rowData, "yyyy-MM-dd HH:mm:ss SSS"));
                 logger.debug(JSON.toJSONString(rowData));
                 logger.info(JSON.toJSONStringWithDateFormat(rowData, "yyyy-MM-dd HH:mm:ss SSS"));  // 支持时间格式的转换
+                logger.info(new Gson().toJson(rowData));
             }
             logger.debug("-------------------------------------");
             System.out.println(tableData);

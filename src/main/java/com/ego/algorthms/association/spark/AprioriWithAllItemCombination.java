@@ -76,7 +76,7 @@ public class AprioriWithAllItemCombination {
         transactions.mapToPair(row -> {
             accumulatorNum.add(1);
             return new Tuple2<>(row.getAs(0).toString().split(",").length, row.getAs(0).toString());
-        })
+        }).cache()
                 .sortByKey(false)
                 .map(x -> x._1)
                 .take(5)
